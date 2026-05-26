@@ -14,7 +14,7 @@ resources/js/pages/Users/Index.vue
 resources/js/pages/Users/Form.vue
 ```
 
-The controller extends `CrudController`, which handles all six CRUD actions automatically. The Vue pages use
+The controller extends Laravel's `Controller` and includes all six CRUD actions explicitly. The Vue pages use
 the [Form Builder](https://github.com/ComfyCodersBV/laravel-vue-form-builder)
 and [Table Builder](https://github.com/ComfyCodersBV/laravel-vue-table-builder) components.
 
