@@ -6,7 +6,7 @@
         "laravel",
         "laravel-vue-crud-builder"
     ],
-    "homepage": "https://github.com/tranquil-tools/laravel-vue-crud-builder",
+    "homepage": "https://github.com/ComfyCodersBV/laravel-vue-crud-builder",
     "license": "MIT",
     "authors": [
         {
@@ -17,8 +17,10 @@
     ],
     "require": {
         "php": "^8.4",
+        "inertiajs/inertia-laravel": "^2.0|^3.0",
         "spatie/laravel-package-tools": "^1.16",
-        "illuminate/contracts": "^11.0||^12.0||^13.0"
+        "tranquil-tools/laravel-vue-form-builder": "^1.0",
+        "tranquil-tools/laravel-vue-table-builder": "^1.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
@@ -34,8 +36,7 @@
     },
     "autoload": {
         "psr-4": {
-            "TranquilTools\\CrudBuilder\\": "src/",
-            "TranquilTools\\CrudBuilder\\Database\\Factories\\": "database/factories/"
+            "TranquilTools\\CrudBuilder\\": "src/"
         }
     },
     "autoload-dev": {
@@ -63,10 +64,7 @@
         "laravel": {
             "providers": [
                 "TranquilTools\\CrudBuilder\\CrudBuilderServiceProvider"
-            ],
-            "aliases": {
-                "CrudBuilder": "TranquilTools\\CrudBuilder\\Facades\\CrudBuilder"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",
