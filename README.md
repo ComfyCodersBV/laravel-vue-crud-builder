@@ -38,7 +38,7 @@ to skip schema detection and generate empty Form/Table classes.
 
 This generates:
 
-- `app/Http/Controllers/UserController.php` — thin controller, extends `CrudController`
+- `app/Http/Controllers/UserController.php` — explicit controller with all CRUD methods
 - `app/Forms/UserForm.php` — form class with schema-detected fields
 - `app/Tables/UserTable.php` — table class with schema-detected columns
 - `app/Http/Requests/UserRequest.php` — form request backed by `UserForm::rules()`
@@ -50,50 +50,33 @@ Then register the route in `routes/web.php`:
 Route::resource('users', \App\Http\Controllers\UserController::class);
 ```
 
-The generated controller is thin — it relies on convention to find the right classes:
+The generated controller extends Laravel's `Controller` and includes all CRUD methods explicitly, using model route
+binding and the generated form, table, and request classes:
 
 ```php
-class UserController extends CrudController
+class UserController extends Controller
 {
-    //
+    public function index(): Response
+    {
+        return Inertia::render('Users/Index', [
+            'table' => UserTable::build()->rowLink(fn ($row) => route('users.show', $row)),
+            'title' => 'Users',
+            'createRoute' => route('users.create'),
+        ]);
+    }
+
+    public function store(UserRequest $request): RedirectResponse
+    {
+        User::create($request->validated());
+
+        return redirect()->route('users.index')->with('success', 'User created.');
+    }
+
+    // edit, update, destroy …
 }
 ```
 
-`CrudController` handles `index`, `create`, `store`, `edit`, `update`, and `destroy` automatically.
-
-### Convention-based resolution
-
-`CrudController` resolves classes by convention at runtime. For `UserController`:
-
-| Class                           | Resolved                         |
-|---------------------------------|----------------------------------|
-| `App\Forms\UserForm`            | Form fields and validation rules |
-| `App\Tables\UserTable`          | Table columns and query          |
-| `App\Http\Requests\UserRequest` | FormRequest for store and update |
-| `App\Models\User`               | Eloquent model                   |
-
-All four paths are configurable via `config/vue-crud-builder.php`. Override any of them with explicit properties on the
-controller:
-
-```php
-class UserController extends CrudController
-{
-    protected string $form  = UserForm::class;
-    protected string $table = UserTable::class;
-}
-```
-
-For separate FormRequests per operation:
-
-```php
-class UserController extends CrudController
-{
-    protected string $storeRequest  = CreateUserRequest::class;
-    protected string $updateRequest = UpdateUserRequest::class;
-}
-```
-
-Available request properties: `$request` (both store and update), `$storeRequest`, `$updateRequest`, `$destroyRequest`.
+All methods are written out explicitly, so you can customize the controller directly.
 
 ### Auto schema detection
 
@@ -198,7 +181,7 @@ return [
     // 'ask'          — prompt during make:crud
     'pages' => env('CRUD_BUILDER_PAGES', 'ask'),
 
-    // Namespaces for convention-based class resolution and code generation
+    // Namespaces used during code generation
     'namespaces' => [
         'models'   => 'App\\Models',
         'forms'    => 'App\\Forms',
