@@ -1,11 +1,7 @@
 # Auto Schema Detection
 
-Schema detection works in two ways:
-
-1. **At generation time** — when you run `make:crud` with a model, the generated `UserForm` and `UserTable` are
-   pre-populated with fields and columns from the database schema.
-2. **At runtime** — if no conventional `UserForm` or `UserTable` class exists (and `$form`/`$table` are not set),
-   `CrudController` falls back to reading the schema live to build the form and table dynamically.
+When you run `make:crud` with a model, the generated `UserForm` and `UserTable` are pre-populated with fields and
+columns from the database schema.
 
 ## Column type mapping
 
@@ -36,26 +32,3 @@ And from table columns:
 password, remember_token
 ```
 
-## Override exclusions
-
-Override the exclusion lists on your controller:
-
-```php
-class UserController extends CrudController
-{
-    protected array $excludedFormColumns  = ['id', 'created_at', 'updated_at'];
-    protected array $excludedTableColumns = [];
-}
-```
-
-## Runtime fallback (no Form/Table class)
-
-If `App\Forms\UserForm` does not exist and `$model` is set, the controller auto-generates the form and table from the
-live schema. This is useful during prototyping before you've customised the generated classes.
-
-```php
-class UserController extends CrudController
-{
-    protected string $model = User::class;
-}
-```

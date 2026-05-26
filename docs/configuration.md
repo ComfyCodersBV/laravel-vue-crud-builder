@@ -15,8 +15,7 @@ return [
     // 'ask'          — prompt during make:crud (default)
     'pages' => env('CRUD_BUILDER_PAGES', 'ask'),
 
-    // Namespaces used for convention-based class resolution and code generation.
-    // UserController resolves App\Forms\UserForm, App\Tables\UserTable, etc. automatically.
+    // Namespaces used during code generation.
     'namespaces' => [
         'models'   => 'App\\Models',
         'forms'    => 'App\\Forms',
