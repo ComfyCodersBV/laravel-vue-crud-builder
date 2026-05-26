@@ -4,8 +4,78 @@ declare(strict_types=1);
 
 namespace {{ namespace }};
 
-use TranquilTools\CrudBuilder\Http\Controllers\CrudController;
+{{ imports }}
 
-class {{ class }} extends CrudController
+class {{ class }} extends Controller
 {
-{{ pages }}}
+    public function index(): Response
+    {
+        return Inertia::render('{{ indexPage }}', [
+            'table' => {{ tableClass }}::build()->rowLink(fn ($row) => route('{{ routePrefix }}.show', $row)),
+            'title' => '{{ title }}',
+            'createRoute' => route('{{ routePrefix }}.create'),
+        ]);
+    }
+
+    public function show({{ modelClass }} ${{ modelParam }}): Response
+    {
+        return Inertia::render('{{ showPage }}', [
+            'record' => ${{ modelParam }}->toArray(),
+            'title' => '{{ singularTitle }}',
+            'editRoute' => route('{{ routePrefix }}.edit', ${{ modelParam }}),
+            'indexRoute' => route('{{ routePrefix }}.index'),
+        ]);
+    }
+
+    public function create(): Response
+    {
+        $form = {{ formClass }}::make()
+            ->action(route('{{ routePrefix }}.store'))
+            ->method('POST');
+
+        return Inertia::render('{{ formPage }}', [
+            'form' => $form,
+            'title' => 'Create {{ singularTitle }}',
+        ]);
+    }
+
+    public function store({{ requestClass }} $request): RedirectResponse
+    {
+        {{ modelClass }}::create($request->validated());
+
+        return redirect()
+            ->route('{{ routePrefix }}.index')
+            ->with('success', '{{ singularTitle }} created.');
+    }
+
+    public function edit({{ modelClass }} ${{ modelParam }}): Response
+    {
+        $form = {{ formClass }}::make()
+            ->fill(${{ modelParam }})
+            ->action(route('{{ routePrefix }}.update', ${{ modelParam }}))
+            ->method('PATCH');
+
+        return Inertia::render('{{ formPage }}', [
+            'form' => $form,
+            'title' => 'Edit {{ singularTitle }}',
+        ]);
+    }
+
+    public function update({{ requestClass }} $request, {{ modelClass }} ${{ modelParam }}): RedirectResponse
+    {
+        ${{ modelParam }}->update($request->validated());
+
+        return redirect()
+            ->route('{{ routePrefix }}.index')
+            ->with('success', '{{ singularTitle }} updated.');
+    }
+
+    public function destroy({{ modelClass }} ${{ modelParam }}): RedirectResponse
+    {
+        ${{ modelParam }}->delete();
+
+        return redirect()
+            ->route('{{ routePrefix }}.index')
+            ->with('success', '{{ singularTitle }} deleted.');
+    }
+}

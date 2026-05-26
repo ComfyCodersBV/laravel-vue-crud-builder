@@ -47,11 +47,71 @@ class CrudMakeCommand extends GeneratorCommand
     {
         $stub = parent::buildClass($name);
 
-        $pagesProperty = $this->pageStyle === 'shared'
-            ? "    protected string \$pages = 'shared';\n\n"
-            : '';
+        $resource = $this->resourceName();
+        $routePrefix = Str::kebab(Str::plural($resource));
+        $modelParam = Str::camel(Str::singular($resource));
 
-        return str_replace('{{ pages }}', $pagesProperty, $stub);
+        $modelsNs = config('vue-crud-builder.namespaces.models', 'App\\Models');
+        $formsNs = config('vue-crud-builder.namespaces.forms', 'App\\Forms');
+        $tablesNs = config('vue-crud-builder.namespaces.tables', 'App\\Tables');
+        $requestsNs = config('vue-crud-builder.namespaces.requests', 'App\\Http\\Requests');
+
+        $modelFqn = $this->modelFqn ?: $modelsNs.'\\'.$resource;
+        $formFqn = $formsNs.'\\'.$resource.'Form';
+        $tableFqn = $tablesNs.'\\'.$resource.'Table';
+        $requestFqn = $requestsNs.'\\'.$resource.'Request';
+
+        $imports = $this->formatImports([
+            $formFqn,
+            $modelFqn,
+            $requestFqn,
+            $tableFqn,
+            'Illuminate\\Http\\RedirectResponse',
+            'Illuminate\\Routing\\Controller',
+            'Inertia\\Inertia',
+            'Inertia\\Response',
+        ]);
+
+        return str_replace(
+            [
+                '{{ imports }}',
+                '{{ modelClass }}',
+                '{{ modelParam }}',
+                '{{ formClass }}',
+                '{{ tableClass }}',
+                '{{ requestClass }}',
+                '{{ routePrefix }}',
+                '{{ indexPage }}',
+                '{{ showPage }}',
+                '{{ formPage }}',
+                '{{ title }}',
+                '{{ singularTitle }}',
+            ],
+            [
+                $imports,
+                class_basename($modelFqn),
+                $modelParam,
+                class_basename($formFqn),
+                class_basename($tableFqn),
+                class_basename($requestFqn),
+                $routePrefix,
+                $this->pagePathFor('Index'),
+                $this->pagePathFor('Show'),
+                $this->pagePathFor('Form'),
+                Str::headline(Str::plural($resource)),
+                Str::headline($resource),
+            ],
+            $stub,
+        );
+    }
+
+    protected function pagePathFor(string $page): string
+    {
+        if ($this->pageStyle === 'shared') {
+            return "Crud/{$page}";
+        }
+
+        return Str::studly(Str::plural($this->resourceName()))."/{$page}";
     }
 
     protected function resolveModelFqn(): string
