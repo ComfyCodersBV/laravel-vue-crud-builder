@@ -1,0 +1,8 @@
+- [Introduction](index.md)
+- [Installation](installation.md)
+- Usage
+    - [Scaffolding a Resource](usage.md)
+    - [Auto Schema Detection](auto-schema.md)
+    - [Vue Pages](vue-pages.md)
+- [Configuration](configuration.md)
+- [Customising Stubs](customising.md)
