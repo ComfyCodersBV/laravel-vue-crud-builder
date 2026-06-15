@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
 
@@ -24,11 +25,14 @@ class CrudMakeCommand extends GeneratorCommand
 
     private string $pageStyle = '';
 
+    private bool $withDestroy = false;
+
     public function handle(): int
     {
         $this->modelFqn = $this->resolveModelFqn();
         $this->showDetectedColumns();
         $this->pageStyle = $this->resolvePageStyle();
+        $this->withDestroy = $this->resolveWithDestroy();
 
         if (parent::handle() === false && ! $this->option('force')) {
             return self::FAILURE;
@@ -72,6 +76,10 @@ class CrudMakeCommand extends GeneratorCommand
             'Inertia\\Response',
         ]);
 
+        $destroyRoute = $this->withDestroy
+            ? "\n            'destroyRoute' => route('{$routePrefix}.destroy', \${$modelParam}),"
+            : '';
+
         return str_replace(
             [
                 '{{ imports }}',
@@ -86,6 +94,7 @@ class CrudMakeCommand extends GeneratorCommand
                 '{{ formPage }}',
                 '{{ title }}',
                 '{{ singularTitle }}',
+                '{{ destroyRoute }}',
             ],
             [
                 $imports,
@@ -100,6 +109,7 @@ class CrudMakeCommand extends GeneratorCommand
                 $this->pagePathFor('Form'),
                 Str::headline(Str::plural($resource)),
                 Str::headline($resource),
+                $destroyRoute,
             ],
             $stub,
         );
@@ -494,6 +504,18 @@ class CrudMakeCommand extends GeneratorCommand
         $this->generateVuePage('form-page', "{$basePath}/Form.vue", $resource);
     }
 
+    protected function resolveWithDestroy(): bool
+    {
+        if ($this->option('destroy')) {
+            return true;
+        }
+
+        return confirm(
+            label: 'Add a delete button to the edit form?',
+            default: true,
+        );
+    }
+
     protected function resolvePageStyle(): string
     {
         if ($this->option('shared')) {
@@ -577,6 +599,7 @@ class CrudMakeCommand extends GeneratorCommand
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model FQCN (skips the model prompt)'],
             ['shared', null, InputOption::VALUE_NONE, 'Use shared Crud/ Vue pages'],
             ['pages', null, InputOption::VALUE_NONE, 'Generate per-resource Vue pages'],
+            ['destroy', null, InputOption::VALUE_NONE, 'Include a delete button on the edit form (skips the prompt)'],
         ];
     }
 }

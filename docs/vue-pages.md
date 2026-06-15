@@ -79,3 +79,25 @@ The `pages` config key controls the default behaviour:
 | `ask`          | Prompt during `make:crud` (default)   |
 
 Pass `--pages` or `--shared` to override the config for a single run.
+
+## Delete button on the edit form
+
+Both the shared `Crud/Form.vue` and generated per-resource `Form.vue` pages support an optional delete button via the
+`destroyRoute` prop. Pass it from the controller's `edit()` method:
+
+```php
+return Inertia::render('Products/Form', [
+    'form' => $form,
+    'title' => 'Edit Product',
+    'destroyRoute' => route('products.destroy', $product),
+]);
+```
+
+The button is only rendered when `destroyRoute` is present. Two additional optional props control the copy:
+
+| Prop             | Default                                        |
+|------------------|------------------------------------------------|
+| `destroyLabel`   | `Remove`                                       |
+| `destroyConfirm` | `Are you sure you want to delete this record?` |
+
+`make:crud` prompts whether to include this automatically, or pass `--destroy` to skip the prompt.

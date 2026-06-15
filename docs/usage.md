@@ -62,9 +62,31 @@ All methods are written out explicitly — customise the controller directly.
 
 ## Available options
 
-| Option         | Description                                   |
-|----------------|-----------------------------------------------|
-| `--model=FQCN` | Model FQCN — skips the interactive prompt     |
-| `--shared`     | Use shared `Crud/Index.vue` + `Crud/Form.vue` |
-| `--pages`      | Generate per-resource Vue pages               |
-| `--force`      | Overwrite existing files                      |
+| Option         | Description                                                 |
+|----------------|-------------------------------------------------------------|
+| `--model=FQCN` | Model FQCN — skips the interactive prompt                   |
+| `--shared`     | Use shared `Crud/Index.vue` + `Crud/Form.vue`               |
+| `--pages`      | Generate per-resource Vue pages                             |
+| `--destroy`    | Include a delete button on the edit form (skips the prompt) |
+| `--force`      | Overwrite existing files                                    |
+
+## Delete button
+
+`make:crud` prompts whether to add a delete button to the edit form. When confirmed, the generated `edit()` method
+includes a `destroyRoute` prop that `Form.vue` uses to render the button.
+
+Pass `--destroy` to skip the prompt and always include it:
+
+```bash
+php artisan make:crud Product --destroy
+```
+
+The generated `edit()` method will contain:
+
+```php
+return Inertia::render('Products/Form', [
+    'form' => $form,
+    'title' => 'Edit Product',
+    'destroyRoute' => route('products.destroy', $product),
+]);
+```

@@ -57,7 +57,7 @@ class {{ class }} extends Controller
 
         return Inertia::render('{{ formPage }}', [
             'form' => $form,
-            'title' => 'Edit {{ singularTitle }}',
+            'title' => 'Edit {{ singularTitle }}',{{ destroyRoute }}
         ]);
     }
 
