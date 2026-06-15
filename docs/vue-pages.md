@@ -4,7 +4,7 @@
 
 `make:crud` generates `Index.vue` and `Form.vue` inside a folder named after the resource:
 
-```
+```txt
 resources/js/pages/Users/Index.vue
 resources/js/pages/Users/Form.vue
 ```
@@ -50,7 +50,7 @@ php artisan vendor:publish --tag=crud-builder-pages
 
 This copies:
 
-```
+```txt
 resources/js/pages/Crud/Index.vue
 resources/js/pages/Crud/Form.vue
 ```

@@ -8,7 +8,7 @@ php artisan vendor:publish --tag=crud-builder-stubs
 
 This copies the stubs to your project's `stubs/` directory:
 
-```
+```txt
 stubs/
   crud-controller.stub  # The controller class
   crud-form.stub        # The Form class

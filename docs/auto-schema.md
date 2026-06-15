@@ -21,14 +21,8 @@ columns from the database schema.
 
 These columns are excluded from forms by default:
 
-```
-id, password, remember_token, email_verified_at,
-created_at, updated_at, deleted_at
-```
+`id, password, remember_token, email_verified_at, created_at, updated_at, deleted_at`
 
 And from table columns:
 
-```
-password, remember_token
-```
-
+`password, remember_token`
