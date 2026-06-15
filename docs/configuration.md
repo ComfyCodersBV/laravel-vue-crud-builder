@@ -10,9 +10,9 @@ php artisan vendor:publish --tag=crud-builder-config
 
 ```php
 return [
-    // 'per-resource' — generate Index.vue + Form.vue per resource
-    // 'shared'       — use published Crud/Index.vue + Crud/Form.vue
-    // 'ask'          — prompt during make:crud (default)
+    // 'per-resource' - generate Index.vue + Form.vue per resource
+    // 'shared'       - use published Crud/Index.vue + Crud/Form.vue
+    // 'ask'          - prompt during make:crud (default)
     'pages' => env('CRUD_BUILDER_PAGES', 'ask'),
 
     // Namespaces used during code generation.

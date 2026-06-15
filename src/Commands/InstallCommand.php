@@ -97,7 +97,7 @@ class InstallCommand extends Command
 
         $msg = $withLayout
             ? 'Inertia layout configured in '.basename($file).'.'
-            : 'Inertia resolve configured in '.basename($file).'. No layout component found — add `page.default.layout ??= AppLayout` manually if needed.';
+            : 'Inertia resolve configured in '.basename($file).'. No layout component found - add `page.default.layout ??= AppLayout` manually if needed.';
 
         $this->components->info($msg);
     }
@@ -205,7 +205,7 @@ class InstallCommand extends Command
         $path = base_path('resources/css/app.css');
 
         if (! file_exists($path)) {
-            $this->components->warn('resources/css/app.css not found — skipping @source setup.');
+            $this->components->warn('resources/css/app.css not found - skipping @source setup.');
 
             return;
         }

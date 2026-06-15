@@ -143,7 +143,7 @@ class CrudMakeCommand extends GeneratorCommand
     {
         if (! $this->modelFqn || ! class_exists($this->modelFqn)) {
             if ($this->modelFqn) {
-                $this->components->warn("Model [{$this->modelFqn}] not found — generating empty Form/Table.");
+                $this->components->warn("Model [{$this->modelFqn}] not found - generating empty Form/Table.");
             }
 
             return;
@@ -535,8 +535,8 @@ class CrudMakeCommand extends GeneratorCommand
         return select(
             label: 'Which Vue page style?',
             options: [
-                'per-resource' => 'Per-resource — generate Index.vue + Form.vue for this resource',
-                'shared' => 'Shared — use the published Crud/Index.vue and Crud/Form.vue',
+                'per-resource' => 'Per-resource - generate Index.vue + Form.vue for this resource',
+                'shared' => 'Shared - use the published Crud/Index.vue and Crud/Form.vue',
             ],
             default: 'per-resource',
         );

@@ -2,6 +2,7 @@
 import { Head, router } from '@inertiajs/vue3'
 import Form from '@form-builder/components/Form.vue'
 import type { FormSchema } from '@form-builder/types/form-builder'
+import { useTranslations } from '@table-builder/composables/useTranslations'
 
 const props = defineProps<{
     form: FormSchema
@@ -11,8 +12,10 @@ const props = defineProps<{
     destroyConfirm?: string
 }>()
 
+const { t } = useTranslations('vue_crud_builder_translations')
+
 function handleDestroy() {
-    const message = props.destroyConfirm ?? 'Are you sure you want to delete this record?'
+    const message = props.destroyConfirm ?? t('delete_confirm')
     if (confirm(message)) {
         router.delete(props.destroyRoute!)
     }
@@ -29,7 +32,7 @@ function handleDestroy() {
             <Form :schema="form" />
             <div v-if="destroyRoute" class="absolute bottom-4 right-4">
                 <button type="button" class="btn btn-danger" @click="handleDestroy">
-                    {{ destroyLabel ?? 'Remove' }}
+                    {{ destroyLabel ?? t('delete') }}
                 </button>
             </div>
         </div>

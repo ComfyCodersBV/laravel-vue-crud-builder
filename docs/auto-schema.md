@@ -8,7 +8,7 @@ columns from the database schema.
 | Database type                                           | Form field | Table column        |
 |---------------------------------------------------------|------------|---------------------|
 | `varchar`, `char`                                       | `Text`     | sortable            |
-| `text`, `longtext`                                      | `Textarea` | —                   |
+| `text`, `longtext`                                      | `Textarea` | -                   |
 | `integer`, `bigint`, `decimal`                          | `Number`   | sortable            |
 | `boolean`, `tinyint` / name starts with `is_` or `has_` | `Toggle`   | sortable            |
 | `date`                                                  | `Date`     | sortable            |

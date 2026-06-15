@@ -33,7 +33,7 @@ const { t } = useTranslations('vue_crud_builder_translations')
                 <span class="w-48 font-medium capitalize text-muted-foreground">
                     {{ String(key).replace(/_/g, ' ') }}
                 </span>
-                <span>{{ value ?? '—' }}</span>
+                <span>{{ value ?? '-' }}</span>
             </div>
         </div>
     </div>

@@ -11,9 +11,9 @@ return [
     |
     | Controls how make:crud generates Vue pages.
     |
-    | 'per-resource' — Generate Index.vue + Form.vue per resource (default)
-    | 'shared'       — Use the published shared Crud/Index.vue + Crud/Form.vue
-    | 'ask'          — Prompt the developer during make:crud
+    | 'per-resource' - Generate Index.vue + Form.vue per resource (default)
+    | 'shared'       - Use the published shared Crud/Index.vue + Crud/Form.vue
+    | 'ask'          - Prompt the developer during make:crud
     |
     */
 

@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.0.3 - 2026-06-15
+* Cleanup & translations
+
 ## 1.0.2 - 2026-06-15
 * Add support for an optional delete button on the edit form which is prompted during scaffolding, skippable with `--destroy`
 

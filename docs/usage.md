@@ -58,13 +58,13 @@ class UserController extends Controller
 }
 ```
 
-All methods are written out explicitly — customise the controller directly.
+All methods are written out explicitly - customise the controller directly.
 
 ## Available options
 
 | Option         | Description                                                 |
 |----------------|-------------------------------------------------------------|
-| `--model=FQCN` | Model FQCN — skips the interactive prompt                   |
+| `--model=FQCN` | Model FQCN - skips the interactive prompt                   |
 | `--shared`     | Use shared `Crud/Index.vue` + `Crud/Form.vue`               |
 | `--pages`      | Generate per-resource Vue pages                             |
 | `--destroy`    | Include a delete button on the edit form (skips the prompt) |

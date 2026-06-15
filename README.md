@@ -38,11 +38,11 @@ to skip schema detection and generate empty Form/Table classes.
 
 This generates:
 
-- `app/Http/Controllers/UserController.php` — explicit controller with all CRUD methods
-- `app/Forms/UserForm.php` — form class with schema-detected fields
-- `app/Tables/UserTable.php` — table class with schema-detected columns
-- `app/Http/Requests/UserRequest.php` — form request backed by `UserForm::rules()`
-- `resources/js/pages/Users/Index.vue` and `Form.vue` — Inertia pages
+- `app/Http/Controllers/UserController.php` - explicit controller with all CRUD methods
+- `app/Forms/UserForm.php` - form class with schema-detected fields
+- `app/Tables/UserTable.php` - table class with schema-detected columns
+- `app/Http/Requests/UserRequest.php` - form request backed by `UserForm::rules()`
+- `resources/js/pages/Users/Index.vue` and `Form.vue` - Inertia pages
 
 Then register the route in `routes/web.php`:
 
@@ -92,7 +92,7 @@ Column type mapping:
 | Database type                          | Form field | Table column |
 |----------------------------------------|------------|--------------|
 | `varchar`, `char`                      | `Text`     | sortable     |
-| `text`, `longtext`                     | `Textarea` | —            |
+| `text`, `longtext`                     | `Textarea` | -            |
 | `integer`, `bigint`, `decimal`         | `Number`   | sortable     |
 | `boolean`, `tinyint` / `is_*`, `has_*` | `Toggle`   | sortable     |
 | `date`                                 | `Date`     | sortable     |
@@ -176,16 +176,16 @@ stubs/
 // config/vue-crud-builder.php
 
 return [
-    // 'per-resource' — generate Index.vue + Form.vue per resource (default)
-    // 'shared'       — use published Crud/Index.vue + Crud/Form.vue
-    // 'ask'          — prompt during make:crud
+    // 'per-resource' - generate Index.vue + Form.vue per resource (default)
+    // 'shared'       - use published Crud/Index.vue + Crud/Form.vue
+    // 'ask'          - prompt during make:crud
     'pages' => env('CRUD_BUILDER_PAGES', 'ask'),
 
     // Namespaces used during code generation
     'namespaces' => [
-        'models'   => 'App\\Models',
-        'forms'    => 'App\\Forms',
-        'tables'   => 'App\\Tables',
+        'models' => 'App\\Models',
+        'forms' => 'App\\Forms',
+        'tables' => 'App\\Tables',
         'requests' => 'App\\Http\\Requests',
     ],
 ];

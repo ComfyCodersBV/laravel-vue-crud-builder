@@ -11,4 +11,6 @@ return [
     'create' => 'Create',
     'edit' => 'Edit',
     'back' => 'Back',
+    'delete' => 'Delete',
+    'delete_confirm' => 'Are you sure you want to delete this record?',
 ];

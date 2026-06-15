@@ -27,4 +27,4 @@ and [Table Builder](https://github.com/ComfyCodersBV/laravel-vue-table-builder) 
 - [`tranquil-tools/laravel-vue-form-builder`](https://github.com/ComfyCodersBV/laravel-vue-form-builder)
 - [`tranquil-tools/laravel-vue-table-builder`](https://github.com/ComfyCodersBV/laravel-vue-table-builder)
 
-Both form and table builder are pulled in automatically as Composer dependencies — no need to require them separately.
+Both form and table builder are pulled in automatically as Composer dependencies - no need to require them separately.
