@@ -106,7 +106,7 @@ from forms by default.
 
 ### Vue pages
 
-The generated `Index.vue` and `Form.vue` use the table and form builder components:
+The generated `Index.vue` and `Form.vue` use the Table- and FormBuilder components:
 
 ```vue
 <!-- Users/Index.vue -->

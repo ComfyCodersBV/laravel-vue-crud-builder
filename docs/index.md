@@ -8,15 +8,15 @@ flow.
 
 ## What it generates
 
-```
+```txt
 app/Http/Controllers/UserController.php
 resources/js/pages/Users/Index.vue
 resources/js/pages/Users/Form.vue
 ```
 
 The controller extends Laravel's `Controller` and includes all six CRUD actions explicitly. The Vue pages use
-the [Form Builder](https://github.com/ComfyCodersBV/laravel-vue-form-builder)
-and [Table Builder](https://github.com/ComfyCodersBV/laravel-vue-table-builder) components.
+the [FormBuilder](https://github.com/ComfyCodersBV/laravel-vue-form-builder)
+and [TableBuilder](https://github.com/ComfyCodersBV/laravel-vue-table-builder) components.
 
 ## Dependencies
 
@@ -24,7 +24,7 @@ and [Table Builder](https://github.com/ComfyCodersBV/laravel-vue-table-builder) 
 - Inertia.js v3
 - Vue 3
 - Tailwind CSS v4
-- [`tranquil-tools/laravel-vue-form-builder`](https://github.com/ComfyCodersBV/laravel-vue-form-builder)
-- [`tranquil-tools/laravel-vue-table-builder`](https://github.com/ComfyCodersBV/laravel-vue-table-builder)
+- [`tranquil-tools/laravel-vue-form-builder`](https://github.com/ComfyCodersBV/laravel-vue-form-builder)*
+- [`tranquil-tools/laravel-vue-table-builder`](https://github.com/ComfyCodersBV/laravel-vue-table-builder)*
 
-Both form and table builder are pulled in automatically as Composer dependencies - no need to require them separately.
+*) Both form and table builder are pulled in automatically as Composer dependencies, no need to require them separately.
