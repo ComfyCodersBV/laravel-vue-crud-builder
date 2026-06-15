@@ -380,6 +380,7 @@ class CrudMakeCommand extends GeneratorCommand
     protected function buildTableContent(): array
     {
         $baseImports = [
+            'Illuminate\\Database\\Eloquent\\Builder',
             'TranquilTools\\TableBuilder\\AbstractTable',
             'TranquilTools\\TableBuilder\\TableBuilder',
         ];
@@ -411,7 +412,7 @@ class CrudMakeCommand extends GeneratorCommand
         $basename = class_basename($modelClass);
         $table = (new $modelClass)->getTable();
 
-        $allImports = array_merge($baseImports, [$modelClass]);
+        $allImports = array_merge($baseImports, ['Illuminate\\Database\\Eloquent\\Builder', $modelClass]);
         $searchCandidates = ['name', 'title', 'email', 'username', 'slug'];
         $searchCols = [];
         $columnLines = [];
@@ -479,7 +480,7 @@ class CrudMakeCommand extends GeneratorCommand
     {
         if ($this->pageStyle === 'shared') {
             if (! file_exists(resource_path('js/Pages/Crud/Index.vue'))) {
-                $this->components->info('Using shared Crud/ Vue pages. Run [php artisan vendor:publish --tag=crud-builder-pages] to publish them.');
+                $this->components->warn('Using shared Crud/ Vue pages. Run [php artisan vendor:publish --tag=crud-builder-pages] to publish them.');
             }
 
             return;
@@ -554,7 +555,7 @@ class CrudMakeCommand extends GeneratorCommand
         $routePrefix = Str::kebab(Str::plural($this->resourceName()));
 
         $this->newLine();
-        $this->components->info('Add to routes/web.php:');
+        $this->components->warn('Add to routes/web.php:');
         $this->line("    Route::resource('{$routePrefix}', \\{$fqcn}::class);");
         $this->newLine();
     }
