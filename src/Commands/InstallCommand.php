@@ -5,21 +5,31 @@ declare(strict_types=1);
 namespace TranquilTools\CrudBuilder\Commands;
 
 use Illuminate\Console\Command;
+use TranquilTools\CrudBuilder\Concerns\DetectsPagesDirectory;
 
 class InstallCommand extends Command
 {
+    use DetectsPagesDirectory;
+
     protected $signature = 'crud-builder:install';
 
-    protected $description = 'Install the CRUD Builder package (publishes config, updates vite.config.ts and app.css)';
+    protected $description = 'Install the CRUD Builder package (publishes config, updates vite config, app.css and the Inertia layout setup)';
 
     protected array $vendorSources = [
+        'laravel-vue-crud-builder',
         'laravel-vue-form-builder',
         'laravel-vue-table-builder',
+    ];
+
+    protected array $viteAliases = [
+        '@form-builder' => 'vendor/tranquil-tools/laravel-vue-form-builder/resources/js',
+        '@table-builder' => 'vendor/tranquil-tools/laravel-vue-table-builder/resources/js',
     ];
 
     public function handle(): int
     {
         $this->publishConfig();
+        $this->updateViteConfig();
         $this->updateAppCss();
         $this->setupInertiaLayout();
 
@@ -54,6 +64,7 @@ class InstallCommand extends Command
 
         if (is_null($file)) {
             $this->components->warn('Could not find inertia entry file. Add persistent layout setup manually (see docs).');
+
             return;
         }
 
@@ -67,17 +78,20 @@ class InstallCommand extends Command
 
         if ($hasLayout && $hasImport) {
             $this->components->info('Inertia layout already configured in '.basename($file).'.');
+
             return;
         }
 
-        if ($hasLayout && ! $hasImport) {
-            if ($withLayout) {
-                $updated = $this->ensureAppLayoutImport($content, $layoutPath);
-                file_put_contents($file, $updated);
-                $this->components->info('Inertia layout import added to '.basename($file).'.');
-            } else {
+        if ($hasLayout) {
+            if (is_null($layoutPath)) {
                 $this->components->warn('Inertia resolve configured but no layout component found. Add import manually.');
+
+                return;
             }
+
+            file_put_contents($file, $this->ensureAppLayoutImport($content, $layoutPath));
+            $this->components->info('Inertia layout import added to '.basename($file).'.');
+
             return;
         }
 
@@ -86,6 +100,7 @@ class InstallCommand extends Command
 
         if (is_null($updated)) {
             $this->components->warn('Could not auto-inject layout setup into '.basename($file).'. Add manually (see docs).');
+
             return;
         }
 
@@ -100,29 +115,6 @@ class InstallCommand extends Command
             : 'Inertia resolve configured in '.basename($file).'. No layout component found - add `page.default.layout ??= AppLayout` manually if needed.';
 
         $this->components->info($msg);
-    }
-
-    protected function detectPagesDir(): string
-    {
-        if (file_exists(resource_path('js/pages'))) {
-            return 'pages';
-        }
-
-        if (file_exists(resource_path('js/Pages'))) {
-            return 'Pages';
-        }
-
-        // Fresh project with no pages dir yet: detect from blade convention
-        foreach (['resources/views/app.blade.php', 'resources/views/root.blade.php'] as $blade) {
-            if (file_exists(base_path($blade))) {
-                $content = file_get_contents(base_path($blade));
-                if (str_contains($content, "\$page['component']") || str_contains($content, "\$page[\"component\"]")) {
-                    return 'pages'; // New Laravel 13+ convention
-                }
-            }
-        }
-
-        return 'Pages';
     }
 
     protected function injectIntoExistingResolve(string $content, string $pagesDir, bool $withLayout): ?string
@@ -147,7 +139,7 @@ class InstallCommand extends Command
             ."        const pages = import.meta.glob('./{$pagesDir}/**/*.vue');\n"
             ."        const page = (await pages[`./{$pagesDir}/\${name}.vue`]()) as any;{$layoutLine}\n"
             ."        return page;\n"
-            ."    },";
+            .'    },';
 
         $updated = preg_replace(
             '/createInertiaApp\(\{/',
@@ -179,10 +171,10 @@ class InstallCommand extends Command
     protected function detectLayoutPath(): ?string
     {
         $candidates = [
-            'resources/js/Layout.vue'              => './Layout.vue',
-            'resources/js/Layouts/AppLayout.vue'   => './Layouts/AppLayout.vue',
-            'resources/js/layouts/AppLayout.vue'   => './layouts/AppLayout.vue',
-            'resources/js/Layouts/Layout.vue'      => './Layouts/Layout.vue',
+            'resources/js/Layout.vue' => './Layout.vue',
+            'resources/js/Layouts/AppLayout.vue' => './Layouts/AppLayout.vue',
+            'resources/js/layouts/AppLayout.vue' => './layouts/AppLayout.vue',
+            'resources/js/Layouts/Layout.vue' => './Layouts/Layout.vue',
         ];
 
         foreach ($candidates as $absolute => $relative) {
@@ -198,6 +190,137 @@ class InstallCommand extends Command
     {
         $this->callSilently('vendor:publish', ['--tag' => 'crud-builder-config']);
         $this->components->info('Config published → config/vue-crud-builder.php');
+    }
+
+    protected function updateViteConfig(): void
+    {
+        $path = $this->locateViteConfig();
+
+        if (is_null($path)) {
+            $this->components->warn('No vite config (vite.config.ts|js|mjs|mts) found - skipping Vite alias setup.');
+
+            return;
+        }
+
+        $content = file_get_contents($path);
+        $missing = [];
+
+        foreach ($this->viteAliases as $alias => $target) {
+            if ($this->hasViteAlias($content, $alias)) {
+                $this->components->info(basename($path)." already has the {$alias} alias.");
+
+                continue;
+            }
+
+            $missing[$alias] = $target;
+        }
+
+        if ($missing === []) {
+            return;
+        }
+
+        $updated = $this->injectViteAliases($content, $missing);
+
+        if (is_null($updated)) {
+            $this->components->warn('Could not auto-inject Vite aliases into '.basename($path).'. Add them manually (see docs).');
+
+            return;
+        }
+
+        file_put_contents($path, $this->ensurePathImport($updated));
+
+        $this->components->info('Vite aliases added to '.basename($path).': '.implode(', ', array_keys($missing)).'.');
+    }
+
+    protected function locateViteConfig(): ?string
+    {
+        foreach (['vite.config.ts', 'vite.config.js', 'vite.config.mjs', 'vite.config.mts'] as $candidate) {
+            if (file_exists(base_path($candidate))) {
+                return base_path($candidate);
+            }
+        }
+
+        return null;
+    }
+
+    protected function hasViteAlias(string $content, string $alias): bool
+    {
+        return str_contains($content, "'{$alias}'")
+            || str_contains($content, "\"{$alias}\"");
+    }
+
+    protected function injectViteAliases(string $content, array $aliases): ?string
+    {
+        $updated = $this->injectIntoExistingAliasBlock($content, $aliases);
+
+        if (! is_null($updated)) {
+            return $updated;
+        }
+
+        if (preg_match('/resolve:\s*\{/', $content) === 1) {
+            return null;
+        }
+
+        return $this->injectResolveIntoDefineConfig($content, $aliases);
+    }
+
+    protected function injectIntoExistingAliasBlock(string $content, array $aliases): ?string
+    {
+        $updated = preg_replace_callback(
+            '/resolve:\s*\{\s*\n([ \t]*)alias:\s*\{/',
+            fn (array $matches): string => $matches[0].$this->viteAliasLines($aliases, $matches[1].'    '),
+            $content,
+            limit: 1,
+        );
+
+        return ($updated !== null && $updated !== $content) ? $updated : null;
+    }
+
+    protected function injectResolveIntoDefineConfig(string $content, array $aliases): ?string
+    {
+        $resolveBlock = "resolve: {\n"
+            .'        alias: {'
+            .$this->viteAliasLines($aliases, '            ')."\n"
+            ."        },\n"
+            .'    },';
+
+        $updated = preg_replace(
+            '/defineConfig\(\{/',
+            "defineConfig({\n    {$resolveBlock}",
+            $content,
+            limit: 1,
+        );
+
+        return ($updated !== null && $updated !== $content) ? $updated : null;
+    }
+
+    protected function viteAliasLines(array $aliases, string $indent): string
+    {
+        $lines = '';
+
+        foreach ($aliases as $alias => $target) {
+            $lines .= "\n{$indent}'{$alias}': path.resolve(__dirname, '{$target}'),";
+        }
+
+        return $lines;
+    }
+
+    protected function ensurePathImport(string $content): string
+    {
+        if (preg_match('/import\s+[^;\n]*from\s*[\'"](?:node:)?path[\'"]/', $content) === 1) {
+            return $content;
+        }
+
+        $import = "import path from 'path';";
+
+        if (! preg_match_all('/^import[^\n]*\n/m', $content, $matches, PREG_OFFSET_CAPTURE)) {
+            return $import."\n".$content;
+        }
+
+        $last = end($matches[0]);
+        $offset = $last[1] + strlen($last[0]);
+
+        return substr($content, 0, $offset).$import."\n".substr($content, $offset);
     }
 
     protected function updateAppCss(): void

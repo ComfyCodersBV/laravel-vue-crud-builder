@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.1.0 - 2026-07-31
+* `crud-builder:install` now patches the Vite aliases, adds this package's own `@source`, and register the missing `crud-builder-stubs` publish tag.
+* Fix generated output: per-resource `Form.vue` supports the delete button, model-less `Table` classes type-check and no longer call `->paginate()`, and pages land in `js/Pages` when that is the project's convention
+* Rewrite the installation and customizing docs to match what the code actually does.
+* Fix `composer analyse` and add Pest testsuite
+
+### Upgrade notes
+* Republish your stubs if you published them (`--tag=crud-builder-stubs --force`); old copies silently miss the fixes above.
+* Projects on `resources/js/Pages` get newly generated pages there instead of in `resources/js/pages`. Move the old ones so the two do not diverge.
+
 ## 1.0.3 - 2026-06-15
 * Cleanup & translations
 

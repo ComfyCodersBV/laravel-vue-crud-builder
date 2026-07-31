@@ -8,14 +8,13 @@ namespace {{ namespace }};
 
 class {{ class }} extends AbstractTable
 {
-    public function for(): Builder
+    public function for(): {{ forType }}
     {
         return {{ forReturn }};
     }
 
     public function configure(TableBuilder $table): void
     {
-        $table{{ columns }}
-            ->paginate(25);
+        $table{{ columns }}{{ pagination }};
     }
 }

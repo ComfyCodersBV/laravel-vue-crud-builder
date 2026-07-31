@@ -1,16 +1,36 @@
 <script setup lang="ts">
+import { router } from '@inertiajs/vue3'
 import Form from '@form-builder/components/Form.vue'
 import type { FormSchema } from '@form-builder/types/form-builder'
+import { useTranslations } from '@table-builder/composables/useTranslations'
 
-defineProps<{
+const props = defineProps<{
     form: FormSchema
     title: string
+    destroyRoute?: string
+    destroyLabel?: string
+    destroyConfirm?: string
 }>()
+
+const { t } = useTranslations('vue_crud_builder_translations')
+
+function handleDestroy() {
+    const message = props.destroyConfirm ?? t('delete_confirm')
+    if (confirm(message)) {
+        router.delete(props.destroyRoute!)
+    }
+}
 </script>
 
 <template>
     <div>
         <h1 class="mb-6 text-2xl font-semibold">{{ title }}</h1>
         <Form :schema="form" />
+
+        <div v-if="destroyRoute" class="mt-4 flex justify-end">
+            <button type="button" class="btn btn-danger" @click="handleDestroy">
+                {{ destroyLabel ?? t('delete') }}
+            </button>
+        </div>
     </div>
 </template>

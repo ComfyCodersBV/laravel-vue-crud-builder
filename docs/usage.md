@@ -13,6 +13,11 @@ Pass `--model` to skip the prompt entirely:
 php artisan make:crud User --model=App\\Domain\\Auth\\Models\\User
 ```
 
+The command prompts up to three times: for the model class, for the [Vue page style](vue-pages.md) (only when the
+`pages` config is `ask`) and for the delete button. `--model`, `--shared` / `--pages` and `--destroy` each skip the
+matching prompt, so passing all of them makes the command fully non-interactive. When a model is given, its detected
+columns are printed before generation starts.
+
 ## What gets generated
 
 | File                                      | Description                               |
@@ -22,7 +27,12 @@ php artisan make:crud User --model=App\\Domain\\Auth\\Models\\User
 | `app/Tables/UserTable.php`                | Table class with schema-detected columns  |
 | `app/Http/Requests/UserRequest.php`       | FormRequest backed by `UserForm::rules()` |
 | `resources/js/pages/Users/Index.vue`      | Inertia index page                        |
+| `resources/js/pages/Users/Show.vue`       | Inertia detail page                       |
 | `resources/js/pages/Users/Form.vue`       | Inertia create/edit page                  |
+
+The three Vue pages are only generated for the per-resource page style. With the shared style the published
+`Crud/*.vue` pages are reused instead - see [Vue Pages](vue-pages.md). The `pages` segment follows your project's
+convention and becomes `Pages` on projects that use `resources/js/Pages/`.
 
 Then register the route:
 
@@ -62,13 +72,15 @@ All methods are written out explicitly - customise the controller directly.
 
 ## Available options
 
-| Option         | Description                                                 |
-|----------------|-------------------------------------------------------------|
-| `--model=FQCN` | Model FQCN - skips the interactive prompt                   |
-| `--shared`     | Use shared `Crud/Index.vue` + `Crud/Form.vue`               |
-| `--pages`      | Generate per-resource Vue pages                             |
-| `--destroy`    | Include a delete button on the edit form (skips the prompt) |
-| `--force`      | Overwrite existing files                                    |
+| Option              | Description                                                 |
+|---------------------|-------------------------------------------------------------|
+| `--model=FQCN`, `-m` | Model FQCN - skips the interactive prompt                   |
+| `--shared`          | Use the shared `Crud/*.vue` pages                           |
+| `--pages`           | Generate per-resource Vue pages                             |
+| `--destroy`         | Include a delete button on the edit form (skips the prompt) |
+| `--force`, `-f`     | Overwrite existing files                                    |
+
+`--shared` wins over `--pages` when both are passed, and both win over the `pages` config value.
 
 ## Delete button
 
