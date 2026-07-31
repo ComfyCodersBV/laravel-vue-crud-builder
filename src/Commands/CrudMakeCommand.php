@@ -8,6 +8,7 @@ use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
+use TranquilTools\CrudBuilder\Concerns\DetectsPagesDirectory;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
@@ -15,6 +16,8 @@ use function Laravel\Prompts\text;
 
 class CrudMakeCommand extends GeneratorCommand
 {
+    use DetectsPagesDirectory;
+
     protected $name = 'make:crud';
 
     protected $type = 'Controller';
@@ -27,7 +30,7 @@ class CrudMakeCommand extends GeneratorCommand
 
     private bool $withDestroy = false;
 
-    public function handle(): int
+    public function handle(): ?bool
     {
         $this->modelFqn = $this->resolveModelFqn();
         $this->showDetectedColumns();
@@ -35,7 +38,7 @@ class CrudMakeCommand extends GeneratorCommand
         $this->withDestroy = $this->resolveWithDestroy();
 
         if (parent::handle() === false && ! $this->option('force')) {
-            return self::FAILURE;
+            $this->fail('Could not create the controller - nothing else was generated.');
         }
 
         $this->generateFormClass();
@@ -44,7 +47,7 @@ class CrudMakeCommand extends GeneratorCommand
         $this->generateVuePages();
         $this->printRouteSnippet();
 
-        return self::SUCCESS;
+        return null;
     }
 
     protected function buildClass($name): string
@@ -223,12 +226,12 @@ class CrudMakeCommand extends GeneratorCommand
             return;
         }
 
-        [$imports, $forReturn, $columns] = $this->buildTableContent();
+        [$imports, $forType, $forReturn, $columns, $pagination] = $this->buildTableContent();
 
         $stub = file_get_contents($this->resolveStubPath('crud-table.stub'));
         $content = str_replace(
-            ['{{ namespace }}', '{{ class }}', '{{ imports }}', '{{ forReturn }}', '{{ columns }}'],
-            [$namespace, $className, $imports, $forReturn, $columns],
+            ['{{ namespace }}', '{{ class }}', '{{ imports }}', '{{ forType }}', '{{ forReturn }}', '{{ columns }}', '{{ pagination }}'],
+            [$namespace, $className, $imports, $forType, $forReturn, $columns, $pagination],
             $stub,
         );
 
@@ -242,7 +245,7 @@ class CrudMakeCommand extends GeneratorCommand
         $resource = $this->resourceName();
 
         $this->call('make:form-request', [
-            'name'   => $resource.'Request',
+            'name' => $resource.'Request',
             '--form' => $resource.'Form',
         ]);
     }
@@ -289,6 +292,7 @@ class CrudMakeCommand extends GeneratorCommand
                 [$line, $extraImports] = $this->buildRelationFieldLine($name, $nullable);
                 $fieldLines[] = $line;
                 $allImports = array_merge($allImports, $extraImports);
+
                 continue;
             }
 
@@ -396,11 +400,7 @@ class CrudMakeCommand extends GeneratorCommand
         ];
 
         if (! $this->modelFqn || ! class_exists($this->modelFqn)) {
-            return [
-                $this->formatImports($baseImports),
-                '[]',
-                "\n            ->column('id', 'ID', sortable: true)",
-            ];
+            return $this->emptyTableContent($baseImports);
         }
 
         try {
@@ -408,12 +408,21 @@ class CrudMakeCommand extends GeneratorCommand
         } catch (\Exception $e) {
             $this->components->warn("Schema detection failed ({$e->getMessage()}). Generating empty Table.");
 
-            return [
-                $this->formatImports($baseImports),
-                '[]',
-                "\n            ->column('id', 'ID', sortable: true)",
-            ];
+            return $this->emptyTableContent($baseImports);
         }
+    }
+
+    protected function emptyTableContent(array $baseImports): array
+    {
+        $imports = array_values(array_diff($baseImports, ['Illuminate\\Database\\Eloquent\\Builder']));
+
+        return [
+            $this->formatImports($imports),
+            'array',
+            '[]',
+            "\n            // Add ->paginate(25) once for() returns a query builder\n            ->column('id', 'ID', sortable: true)",
+            '',
+        ];
     }
 
     protected function schemaToTableContent(string $modelClass, array $baseImports): array
@@ -447,11 +456,11 @@ class CrudMakeCommand extends GeneratorCommand
         $imports = $this->formatImports(array_unique($allImports));
         $forReturn = $basename.'::query()';
         $searchLine = $searchCols
-            ? "            ->withGlobalSearch(columns: [".implode(', ', $searchCols)."])\n"
+            ? '            ->withGlobalSearch(columns: ['.implode(', ', $searchCols)."])\n"
             : '';
         $columns = "\n".$searchLine.implode("\n", $columnLines);
 
-        return [$imports, $forReturn, $columns];
+        return [$imports, 'Builder', $forReturn, $columns, "\n            ->paginate(25)"];
     }
 
     protected function isSortableType(string $type): bool
@@ -488,8 +497,10 @@ class CrudMakeCommand extends GeneratorCommand
 
     protected function generateVuePages(): void
     {
+        $pagesDir = $this->detectPagesDir();
+
         if ($this->pageStyle === 'shared') {
-            if (! file_exists(resource_path('js/Pages/Crud/Index.vue'))) {
+            if (! file_exists(resource_path("js/{$pagesDir}/Crud/Index.vue"))) {
                 $this->components->warn('Using shared Crud/ Vue pages. Run [php artisan vendor:publish --tag=crud-builder-pages] to publish them.');
             }
 
@@ -497,7 +508,7 @@ class CrudMakeCommand extends GeneratorCommand
         }
 
         $resource = Str::studly(Str::plural($this->resourceName()));
-        $basePath = resource_path("js/pages/{$resource}");
+        $basePath = resource_path("js/{$pagesDir}/{$resource}");
 
         $this->generateVuePage('index-page', "{$basePath}/Index.vue", $resource);
         $this->generateVuePage('show-page', "{$basePath}/Show.vue", $resource);

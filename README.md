@@ -19,11 +19,15 @@ Install the required npm packages:
 npm install reka-ui lucide-vue-next
 ```
 
-Then run the installer, which publishes the config and patches `vite.config.ts` and `resources/css/app.css`:
+Then run the installer, which publishes the config, adds the `@form-builder` / `@table-builder` aliases to your Vite
+config, adds the Tailwind `@source` directives to `resources/css/app.css`, and wires up the persistent Inertia layout:
 
 ```bash
 php artisan crud-builder:install
 ```
+
+See [docs/installation.md](docs/installation.md) for exactly what is written where, the publish tags, and what to do
+when a step cannot be applied automatically.
 
 ## Usage
 
@@ -42,7 +46,7 @@ This generates:
 - `app/Forms/UserForm.php` - form class with schema-detected fields
 - `app/Tables/UserTable.php` - table class with schema-detected columns
 - `app/Http/Requests/UserRequest.php` - form request backed by `UserForm::rules()`
-- `resources/js/pages/Users/Index.vue` and `Form.vue` - Inertia pages
+- `resources/js/pages/Users/Index.vue`, `Show.vue` and `Form.vue` - Inertia pages
 
 Then register the route in `routes/web.php`:
 
@@ -98,48 +102,25 @@ Column type mapping:
 | `date`                                 | `Date`     | sortable     |
 | `datetime`, `timestamp`                | `DateTime` | sortable     |
 | name contains `email`                  | `Email`    | sortable     |
-| name contains `password`               | `Password` | excluded     |
+| name contains `password`               | `Password` | -            |
 | name contains `color`                  | `Color`    | sortable     |
+| name ends with `_id` (integer)         | `Select`   | sortable     |
 
 Columns `id`, `password`, `remember_token`, `email_verified_at`, `created_at`, `updated_at`, `deleted_at` are excluded
-from forms by default.
+from forms by default; `password` and `remember_token` are excluded from tables. See
+[docs/auto-schema.md](docs/auto-schema.md) for the full mapping, relation selects and global search.
 
 ### Vue pages
 
-The generated `Index.vue` and `Form.vue` use the Table- and FormBuilder components:
-
-```vue
-<!-- Users/Index.vue -->
-<script setup lang="ts">
-    import TableBuilder from '@table-builder/components/TableBuilder.vue'
-    import type {TableData} from '@table-builder/types/table-builder'
-
-    defineProps<{ table: TableData; title: string; createRoute: string }>()
-</script>
-
-<template>
-    <TableBuilder :table="table"/>
-</template>
-```
-
-```vue
-<!-- Users/Form.vue -->
-<script setup lang="ts">
-    import Form from '@form-builder/components/Form.vue'
-    import type {FormSchema} from '@form-builder/types/form-builder'
-
-    defineProps<{ form: FormSchema; title: string }>()
-</script>
-
-<template>
-    <Form :schema="form"/>
-</template>
-```
+The generated `Index.vue`, `Show.vue` and `Form.vue` render the TableBuilder and FormBuilder components from the
+`@table-builder` / `@form-builder` aliases and receive everything they need as Inertia props (`table`, `form`,
+`record`, `title` and the route props). See [docs/vue-pages.md](docs/vue-pages.md) for the full page contents and the
+props each page accepts.
 
 ### Shared Vue pages
 
-Instead of generating per-resource pages, publish shared `Crud/Index.vue` and `Crud/Form.vue` pages once and reuse them
-across all CRUD resources:
+Instead of generating per-resource pages, publish the shared `Crud/Index.vue`, `Crud/Show.vue` and `Crud/Form.vue`
+pages once and reuse them across all CRUD resources:
 
 ```bash
 php artisan vendor:publish --tag=crud-builder-pages
@@ -168,7 +149,10 @@ stubs/
   crud-table.stub       # the Table class
   index-page.stub       # the Index Vue page
   form-page.stub        # the Form Vue page
+  show-page.stub        # the Show Vue page
 ```
+
+See [docs/customising.md](docs/customising.md) for the placeholders each stub supports.
 
 ## Configuration
 
@@ -176,9 +160,9 @@ stubs/
 // config/vue-crud-builder.php
 
 return [
-    // 'per-resource' - generate Index.vue + Form.vue per resource (default)
-    // 'shared'       - use published Crud/Index.vue + Crud/Form.vue
-    // 'ask'          - prompt during make:crud
+    // 'per-resource' - generate Index.vue + Show.vue + Form.vue per resource
+    // 'shared'       - use the published Crud/ pages
+    // 'ask'          - prompt during make:crud (default)
     'pages' => env('CRUD_BUILDER_PAGES', 'ask'),
 
     // Namespaces used during code generation
@@ -190,6 +174,8 @@ return [
     ],
 ];
 ```
+
+See [docs/configuration.md](docs/configuration.md) for what each namespace is used for.
 
 ## Changelog
 

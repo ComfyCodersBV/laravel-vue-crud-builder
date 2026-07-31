@@ -5,6 +5,8 @@ namespace TranquilTools\CrudBuilder\Tests;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 use TranquilTools\CrudBuilder\CrudBuilderServiceProvider;
+use TranquilTools\FormBuilder\FormBuilderServiceProvider;
+use TranquilTools\TableBuilder\TableBuilderServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -20,6 +22,8 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
+            FormBuilderServiceProvider::class,
+            TableBuilderServiceProvider::class,
             CrudBuilderServiceProvider::class,
         ];
     }
