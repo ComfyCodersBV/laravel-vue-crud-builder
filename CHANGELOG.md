@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.2.0 - unreleased
+
+Released together with form-builder 1.2.0 and table-builder 1.2.0. **Read the form-builder upgrade
+note**: WYSIWYG editors are now opt-in, so a project using `->editor('quill')` registers the adapter
+in its app entrypoint or gets a textarea.
+
+* Add a `package.json` declaring `@inertiajs/vue3` as this package's only direct frontend peer. The
+  components it publishes reach everything else through form-builder and table-builder, whose own
+  manifests now declare their ranges.
+* `export-ignore` the manifest, its lockfile and the CI configuration, so `--prefer-dist` installs
+  carry only `resources/`, `src/`, `config/`, `lang/` and `stubs/`.
+
 ## 1.1.0 - 2026-07-31
 * `crud-builder:install` now patches the Vite aliases, adds this package's own `@source`, and register the missing `crud-builder-stubs` publish tag.
 * Fix generated output: per-resource `Form.vue` supports the delete button, model-less `Table` classes type-check and no longer call `->paginate()`, and pages land in `js/Pages` when that is the project's convention
