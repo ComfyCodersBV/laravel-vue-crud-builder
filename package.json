@@ -1,0 +1,7 @@
+{
+    "name": "@tranquil-tools/laravel-vue-crud-builder",
+    "private": true,
+    "peerDependencies": {
+        "@inertiajs/vue3": ">=2 <4"
+    }
+}
