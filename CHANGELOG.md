@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
-## 1.2.0 - unreleased
+## 1.2.0 - 2026-08-14
 
 Released together with form-builder 1.2.0 and table-builder 1.2.0. **Read the form-builder upgrade
 note:** WYSIWYG editors are now opt-in, so a project using `->editor('quill')` registers the adapter
