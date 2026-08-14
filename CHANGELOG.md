@@ -8,6 +8,9 @@ Released together with form-builder 1.2.0 and table-builder 1.2.0. **Read the fo
 note:** WYSIWYG editors are now opt-in, so a project using `->editor('quill')` registers the adapter
 in its app entrypoint or gets a textarea.
 
+* Require form-builder and table-builder at `^1.2`. The 1.1 line of form-builder still carries the
+  PHP that has since moved to `tranquil-tools/laravel-form-builder`, and its `make:form-request`
+  command is broken on Laravel 13.24 and later, so `crud:make` fails against it.
 * Add a `package.json` declaring `@inertiajs/vue3` as this package's only direct frontend peer.
 * `export-ignore` the manifest, lockfile and CI config, keeping dist installs to `resources/`, `src/`,
   `config/`, `lang/` and `stubs/`.
