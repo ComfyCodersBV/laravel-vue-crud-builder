@@ -16,11 +16,12 @@ composer require tranquil-tools/laravel-vue-crud-builder
 Install the required npm packages:
 
 ```bash
-npm install reka-ui lucide-vue-next
+npm install reka-ui @lucide/vue
 ```
 
 Then run the installer, which publishes the config, adds the `@form-builder` / `@table-builder` aliases to your Vite
-config, adds the Tailwind `@source` directives to `resources/css/app.css`, and wires up the persistent Inertia layout:
+config and the matching `paths` to `tsconfig.json`, and adds the Tailwind `@source` directives to
+`resources/css/app.css`. It leaves your Inertia entry file alone; the CRUD pages use whatever layout your app assigns:
 
 ```bash
 php artisan crud-builder:install

@@ -11,8 +11,12 @@ composer require tranquil-tools/laravel-vue-crud-builder
 The Vue components rendered by the Form- and TableBuilder need two runtime packages:
 
 ```bash
-npm install reka-ui lucide-vue-next
+npm install reka-ui @lucide/vue
 ```
+
+The builder components import their icons from `lucide-vue-next`. Laravel's current starter kits ship `@lucide/vue`,
+its maintained successor with the same icons, so when your `package.json` has `@lucide/vue` and not
+`lucide-vue-next`, the installer aliases one to the other in Vite. Apps that already use `lucide-vue-next` keep it.
 
 ## Installer
 
@@ -23,52 +27,71 @@ php artisan crud-builder:install
 The installer:
 
 1. Publishes `config/vue-crud-builder.php`
-2. Adds the `@form-builder` and `@table-builder` Vite aliases (and `import path from 'path'` when missing)
-3. Adds the `@source` directives for the three builder packages to `resources/css/app.css`
-4. Wires up the persistent Inertia layout in your Inertia entry file
+2. Adds the `@form-builder` and `@table-builder` Vite aliases (plus the `lucide-vue-next` alias described above)
+3. Adds the matching `paths` to `tsconfig.json` so `vue-tsc` resolves the builder types
+4. Adds the `@source` directives for the three builder packages to `resources/css/app.css`
+5. Checks your Inertia entry file for a layout setup and tells you when there is none
 
-Every step is skipped with a warning when the target file cannot be found or cannot be parsed - the installer never
-rewrites a file it does not understand, so it is safe to re-run.
+Every step only adds what is missing, so running the installer twice changes nothing. A step is skipped with a warning
+when the target file cannot be found or cannot be parsed - the installer never rewrites a file it does not understand.
 
 ## Vite aliases
 
 The installer looks for `vite.config.ts`, `vite.config.js`, `vite.config.mjs` or `vite.config.mts` in the project root
-(first match wins) and makes sure both aliases exist:
+(first match wins) and makes sure both aliases exist. Vite configs are ES modules, where `__dirname` does not exist, so
+the paths are resolved from `import.meta.url`:
 
 ```ts
-'@form-builder': path.resolve(__dirname, 'vendor/tranquil-tools/laravel-vue-form-builder/resources/js'),
-'@table-builder': path.resolve(__dirname, 'vendor/tranquil-tools/laravel-vue-table-builder/resources/js'),
+import { fileURLToPath } from 'node:url';
+
+export default defineConfig({
+    resolve: {
+        alias: {
+            '@form-builder': fileURLToPath(
+                new URL(
+                    './vendor/tranquil-tools/laravel-vue-form-builder/resources/js',
+                    import.meta.url,
+                ),
+            ),
+            '@table-builder': fileURLToPath(
+                new URL(
+                    './vendor/tranquil-tools/laravel-vue-table-builder/resources/js',
+                    import.meta.url,
+                ),
+            ),
+        },
+    },
+});
 ```
 
 These are the only two aliases needed. The CRUD Builder's own Vue pages are published into your `resources/js`, so
 there is no `@crud-builder` alias.
 
 If the config already has a `resolve.alias` block, the missing aliases are inserted into it. If there is no `resolve`
-block at all, a complete one is injected into `defineConfig({`. Anything else (for example a `resolve` block without an
-`alias` key, or a config that does not use `defineConfig`) is left untouched with a warning so you can add the two lines
-by hand.
+block at all, a complete one is injected into `defineConfig({` (this works for `vite` and `vite-plus` alike). Anything
+else (for example a `resolve` block without an `alias` key, or a config that does not use `defineConfig`) is left
+untouched with a warning so you can add the lines by hand.
 
-An `import path from 'path'` statement is added after the last top-level import when the file has no `path` import yet;
-an existing `from 'path'` or `from 'node:path'` import is reused.
+`fileURLToPath` is added to an existing `node:url` import, or imported after your last import. An alias that is already
+there is never changed. Projects installed with 1.2 or older have `path.resolve(__dirname, …)` aliases; the installer
+warns about those, and you switch them to the form above.
 
-### Vite config (after install)
+## TypeScript paths
 
-```ts
-import { defineConfig } from 'vite';
-import path from 'path';
+The generated and published pages import types and composables from both builders. When the project has a
+`tsconfig.json`, the installer adds these entries to `compilerOptions.paths`, creating the `paths` block when there is
+none:
 
-export default defineConfig({
-    resolve: {
-        alias: {
-            '@form-builder': path.resolve(__dirname, 'vendor/tranquil-tools/laravel-vue-form-builder/resources/js'),
-            '@table-builder': path.resolve(__dirname, 'vendor/tranquil-tools/laravel-vue-table-builder/resources/js'),
-        },
-    },
-});
+```json
+"@form-builder/types/*": ["./vendor/tranquil-tools/laravel-vue-form-builder/resources/js/types/*"],
+"@form-builder/composables/*": ["./vendor/tranquil-tools/laravel-vue-form-builder/resources/js/composables/*"],
+"@table-builder/types/*": ["./vendor/tranquil-tools/laravel-vue-table-builder/resources/js/types/*"],
+"@table-builder/composables/*": ["./vendor/tranquil-tools/laravel-vue-table-builder/resources/js/composables/*"]
 ```
 
-Only the two `@…-builder` lines and the `path` import come from the installer. Aliases like `'@': '/resources/js'` are
-your own application config and are left exactly as they are.
+Component imports such as `@table-builder/components/TableBuilder.vue` are deliberately left to your `*.vue` module
+declaration, so `vue-tsc` checks your code and not the package sources. An entry that is already there, or a wildcard
+such as `"@form-builder/*"`, is left as it is. Comments in `tsconfig.json` are preserved.
 
 ## Tailwind sources
 
@@ -84,55 +107,25 @@ there is none.
 @source '../../vendor/tranquil-tools/laravel-vue-table-builder/resources/js/**/*.vue';
 ```
 
-## Inertia layout setup
+## Inertia layout
 
-The generated and published CRUD pages render bare content, so they expect a persistent layout. The installer
-configures that for you.
+The generated and published CRUD pages render bare content, so they rely on the layout your app assigns. The installer
+never rewrites your Inertia entry file: forcing a default layout would also wrap pages that deliberately have none, such
+as a welcome or login page.
 
-It looks for the first of these Inertia entry files:
-
-```txt
-resources/js/inertia.ts
-resources/js/inertia.js
-resources/js/app.ts
-resources/js/app.js
-```
-
-Then it rewrites `createInertiaApp`'s `resolve` into its async form and assigns the layout:
+It looks for the first of `resources/js/inertia.ts`, `inertia.js`, `app.ts` or `app.js` and only reports what it finds.
+When there is a layout setup (a `layout` option on `createInertiaApp`, or a `page.default.layout` assignment in
+`resolve`), CRUD pages get the layout it picks for them. When there is none, it warns, and you add one yourself. On
+Inertia 3, as in Laravel's starter kits:
 
 ```ts
-import { createInertiaApp } from '@inertiajs/vue3';
-import AppLayout from './layouts/AppLayout.vue';
-
 createInertiaApp({
-    resolve: async (name) => {
-        const page = await resolvePageComponent(`./pages/${name}.vue`, import.meta.glob('./pages/**/*.vue'));
-        page.default.layout ??= AppLayout;
-        return page;
-    },
+    layout: (name) => (name === 'Welcome' ? null : AppLayout),
     // …
 });
 ```
 
-When there is no `resolve` yet, a complete one is injected into `createInertiaApp({` using `import.meta.glob` over the
-detected pages directory. The `import AppLayout from …` statement is added right after the `@inertiajs/vue3` import.
-
-### Layout detection
-
-The layout component is auto-detected, first match wins:
-
-| File                                  | Import path                  |
-|---------------------------------------|------------------------------|
-| `resources/js/Layout.vue`             | `./Layout.vue`               |
-| `resources/js/Layouts/AppLayout.vue`  | `./Layouts/AppLayout.vue`    |
-| `resources/js/layouts/AppLayout.vue`  | `./layouts/AppLayout.vue`    |
-| `resources/js/Layouts/Layout.vue`     | `./Layouts/Layout.vue`       |
-
-When none of these exist, the `resolve` is still converted but the `page.default.layout ??= AppLayout` line and the
-import are left out - the installer warns and you add your own layout line. When both the layout line and the import
-are already there, the file is left alone.
-
-### Pages directory detection
+## Pages directory detection
 
 Laravel's Inertia starter kits use `resources/js/pages`, older projects use `resources/js/Pages`. The installer (and
 the `crud-builder-pages` publish tag) detect which one you use:
