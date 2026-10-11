@@ -164,7 +164,7 @@ return [
     // 'per-resource' - generate Index.vue + Show.vue + Form.vue per resource
     // 'shared'       - use the published Crud/ pages
     // 'ask'          - prompt during make:crud (default)
-    'pages' => env('CRUD_BUILDER_PAGES', 'ask'),
+    'pages' => 'ask',
 
     // Namespaces used during code generation
     'namespaces' => [

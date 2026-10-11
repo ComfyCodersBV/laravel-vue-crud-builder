@@ -13,7 +13,7 @@ return [
     // 'per-resource' - generate Index.vue + Show.vue + Form.vue per resource
     // 'shared'       - use the published Crud/ pages
     // 'ask'          - prompt during make:crud (default)
-    'pages' => env('CRUD_BUILDER_PAGES', 'ask'),
+    'pages' => 'ask',
 
     // Namespaces used during code generation.
     'namespaces' => [
@@ -25,11 +25,9 @@ return [
 ];
 ```
 
-Set the pages style via environment variable:
-
-```env
-CRUD_BUILDER_PAGES=per-resource
-```
+Change `pages` in the published file to pick a style for good. To choose it per environment, read an environment
+variable of your own there, for example `'pages' => env('CRUD_BUILDER_PAGES', 'ask')`; the package default no longer
+does, because Larastan flags `env()` outside the application's config directory.
 
 `crud-builder:install` publishes this file for you; the command above is only needed when you skipped the installer or
 deleted the file.
