@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.3.1 - 2026-10-11
+
+* Require laravel-vue-form-builder 1.6 and laravel-vue-table-builder 1.5, so a crud-builder install pulls in the
+  row actions, empty states, reorder persistence, date filters and configurable query keys of the table builder, and
+  the timezone-aware date fields, per-use form overrides, translatable built-in texts, file previews, sections and
+  method spoofing for uploads of the form builder.
+
 ## 1.3.0 - 2026-10-11
 
 Makes `crud-builder:install` safe on Laravel's current Vue starter kit (Inertia 3, `vite-plus`, `@lucide/vue`).
