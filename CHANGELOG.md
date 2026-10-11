@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.4.0 - 2026-10-11
+
+* Require laravel-vue-form-builder 1.7 and laravel-vue-table-builder 1.6. A crud-builder install now pulls in the
+  table builder's totals row, CSV export, download row actions, date filter timezones, overlap mode and presets,
+  tie-safe reordering and expiring signed routes with authorization hooks, and the form builder's new field types.
+* Both builders import their icons from `@lucide/vue`, so `crud-builder:install` no longer aliases `lucide-vue-next` to
+  `@lucide/vue` in Vite. It warns when `@lucide/vue` is missing from `package.json`. An alias added by 1.3 is harmless
+  and stays untouched; the installer still only adds what is missing.
+* The package config defaults `pages` to `'ask'` instead of reading `env('CRUD_BUILDER_PAGES')`, which Larastan flags
+  outside the application's config directory.
+
+### Upgrade notes
+* Apps that only have `lucide-vue-next` need `npm install @lucide/vue`.
+* `CRUD_BUILDER_PAGES` is only read when your published `config/vue-crud-builder.php` reads it. Published configs keep
+  their `env()` call; without a published config, set `pages` in a published copy.
+
 ## 1.3.1 - 2026-10-11
 
 * Require laravel-vue-form-builder 1.6 and laravel-vue-table-builder 1.5, so a crud-builder install pulls in the
