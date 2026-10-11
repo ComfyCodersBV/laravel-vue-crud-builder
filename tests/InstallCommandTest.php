@@ -152,26 +152,38 @@ it('adds a source directive for every builder package to app.css and stays idemp
     expect(file_get_contents($path))->toBe($afterFirstRun);
 });
 
-it('aliases lucide-vue-next to @lucide/vue when the app only has @lucide/vue', function () {
+it('adds no lucide alias now that the builders import @lucide/vue', function () {
     $path = $this->sandbox.'/vite.config.ts';
 
     file_put_contents($this->sandbox.'/package.json', json_encode(['dependencies' => ['@lucide/vue' => '^1.17.0']]));
     file_put_contents($path, "import { defineConfig } from 'vite';\n\nexport default defineConfig({\n    plugins: [],\n});\n");
+
+    $this->artisan('crud-builder:install')
+        ->doesntExpectOutputToContain('@lucide/vue, which is not in package.json')
+        ->assertSuccessful();
+
+    expect(file_get_contents($path))->not->toContain('lucide');
+});
+
+it('keeps the lucide alias of an earlier install untouched', function () {
+    $path = $this->sandbox.'/vite.config.ts';
+    $config = "import { defineConfig } from 'vite';\n\nexport default defineConfig({\n    resolve: {\n        alias: {\n            'lucide-vue-next': '@lucide/vue',\n        },\n    },\n    plugins: [],\n});\n";
+
+    file_put_contents($this->sandbox.'/package.json', json_encode(['dependencies' => ['@lucide/vue' => '^1.17.0']]));
+    file_put_contents($path, $config);
 
     $this->artisan('crud-builder:install')->assertSuccessful();
 
     expect(file_get_contents($path))->toContain("'lucide-vue-next': '@lucide/vue',");
 });
 
-it('does not alias lucide when the app has lucide-vue-next', function () {
-    $path = $this->sandbox.'/vite.config.ts';
+it('asks for @lucide/vue when the app only has lucide-vue-next', function () {
+    file_put_contents($this->sandbox.'/package.json', json_encode(['devDependencies' => ['lucide-vue-next' => '^1.0']]));
+    file_put_contents($this->sandbox.'/vite.config.ts', "import { defineConfig } from 'vite';\n\nexport default defineConfig({\n    plugins: [],\n});\n");
 
-    file_put_contents($this->sandbox.'/package.json', json_encode(['devDependencies' => ['@lucide/vue' => '^1.0', 'lucide-vue-next' => '^1.0']]));
-    file_put_contents($path, "import { defineConfig } from 'vite';\n\nexport default defineConfig({\n    plugins: [],\n});\n");
-
-    $this->artisan('crud-builder:install')->assertSuccessful();
-
-    expect(file_get_contents($path))->not->toContain('lucide');
+    $this->artisan('crud-builder:install')
+        ->expectsOutputToContain('npm install @lucide/vue')
+        ->assertSuccessful();
 });
 
 it('adds the builder paths to an existing tsconfig paths block with comments', function () {

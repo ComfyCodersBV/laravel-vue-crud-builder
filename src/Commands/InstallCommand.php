@@ -72,13 +72,10 @@ class InstallCommand extends Command
         }
 
         $content = file_get_contents($path);
-        $wanted = [
-            ...$this->viteAliases,
-            ...$this->iconPackageAlias(),
-        ];
+        $this->checkIconPackage();
 
         $missing = array_filter(
-            $wanted,
+            $this->viteAliases,
             fn (string $alias): bool => ! $vite->hasAlias($content, $alias),
             ARRAY_FILTER_USE_KEY,
         );
@@ -104,24 +101,13 @@ class InstallCommand extends Command
         $this->components->info('Vite aliases added to '.basename($path).': '.implode(', ', array_keys($missing)).'.');
     }
 
-    /**
-     * @return array<string, string>
-     */
-    protected function iconPackageAlias(): array
+    protected function checkIconPackage(): void
     {
-        $dependencies = $this->npmDependencies();
-
-        if (array_key_exists('lucide-vue-next', $dependencies)) {
-            return [];
+        if (array_key_exists('@lucide/vue', $this->npmDependencies())) {
+            return;
         }
 
-        if (array_key_exists('@lucide/vue', $dependencies)) {
-            return ['lucide-vue-next' => '@lucide/vue'];
-        }
-
-        $this->components->warn('No Lucide icon package found in package.json. Run `npm install @lucide/vue` and re-run this installer.');
-
-        return [];
+        $this->components->warn('The builders import their icons from @lucide/vue, which is not in package.json. Run `npm install @lucide/vue`.');
     }
 
     /**

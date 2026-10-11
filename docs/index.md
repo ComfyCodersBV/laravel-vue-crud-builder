@@ -29,7 +29,7 @@ and [TableBuilder](https://github.com/ComfyCodersBV/laravel-vue-table-builder) c
 - Inertia.js v2 or v3 (`inertiajs/inertia-laravel: ^2.0|^3.0`)
 - Vue 3
 - Tailwind CSS v4
-- `reka-ui` and `@lucide/vue` or `lucide-vue-next` (npm)
+- `reka-ui` and `@lucide/vue` (npm)
 - [`tranquil-tools/laravel-vue-form-builder`](https://github.com/ComfyCodersBV/laravel-vue-form-builder)*
 - [`tranquil-tools/laravel-vue-table-builder`](https://github.com/ComfyCodersBV/laravel-vue-table-builder)*
 

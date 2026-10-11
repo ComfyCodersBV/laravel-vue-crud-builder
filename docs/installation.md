@@ -14,9 +14,9 @@ The Vue components rendered by the Form- and TableBuilder need two runtime packa
 npm install reka-ui @lucide/vue
 ```
 
-The builder components import their icons from `lucide-vue-next`. Laravel's current starter kits ship `@lucide/vue`,
-its maintained successor with the same icons, so when your `package.json` has `@lucide/vue` and not
-`lucide-vue-next`, the installer aliases one to the other in Vite. Apps that already use `lucide-vue-next` keep it.
+The builder components import their icons from `@lucide/vue`, the maintained successor of `lucide-vue-next` that
+Laravel's current starter kits ship. The installer warns when it is missing from `package.json`. A
+`'lucide-vue-next': '@lucide/vue'` alias added by an earlier installer is harmless and may stay or go.
 
 ## Installer
 
@@ -27,7 +27,7 @@ php artisan crud-builder:install
 The installer:
 
 1. Publishes `config/vue-crud-builder.php`
-2. Adds the `@form-builder` and `@table-builder` Vite aliases (plus the `lucide-vue-next` alias described above)
+2. Adds the `@form-builder` and `@table-builder` Vite aliases
 3. Adds the matching `paths` to `tsconfig.json` so `vue-tsc` resolves the builder types
 4. Adds the `@source` directives for the three builder packages to `resources/css/app.css`
 5. Checks your Inertia entry file for a layout setup and tells you when there is none
