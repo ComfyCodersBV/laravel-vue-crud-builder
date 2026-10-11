@@ -2,6 +2,24 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.3.0 - 2026-10-11
+
+Makes `crud-builder:install` safe on Laravel's current Vue starter kit (Inertia 3, `vite-plus`, `@lucide/vue`).
+
+* Stop rewriting the Inertia entry file. The installer no longer injects a `resolve` with `as any` and
+  `page.default.layout ??= AppLayout`, which overrode the starter kit's `layout` callback and put the app layout on the
+  welcome page. It now only reports whether a layout setup exists.
+* Resolve the Vite aliases with `fileURLToPath(new URL(…, import.meta.url))` from `node:url` instead of
+  `path.resolve(__dirname, …)`, which ES module configs do not define. Existing `__dirname` aliases get a warning.
+* Add the builder `types` and `composables` paths to `tsconfig.json`, so `vue-tsc` passes on generated and published
+  pages. Comments in the file are preserved.
+* Alias `lucide-vue-next` to `@lucide/vue` in Vite when the app only has `@lucide/vue`.
+* Running the installer twice changes nothing; it only adds what is missing.
+
+### Upgrade notes
+* Projects installed with an earlier version keep their `path.resolve(__dirname, …)` aliases. Switch them to the
+  `fileURLToPath` form shown in the installation docs if your Vite config runs as an ES module.
+
 ## 1.2.0 - 2026-08-14
 
 Released together with form-builder 1.2.0 and table-builder 1.2.0. **Read the form-builder upgrade
