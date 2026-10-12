@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.5.0 - 2026-10-12
+
+* Require laravel-vue-form-builder 1.8 and laravel-vue-table-builder 1.7. A crud-builder install now pulls in the
+  table builder's "Select all N results" that runs a bulk action over every filtered row instead of the current page,
+  the confirmation of bulk actions in the Vue component, chunking that no longer skips rows of a sorted table, and
+  `withoutColumnToggle()` to hide the "Columns" menu, together with the form builder 1.8 changes.
+
 ## 1.4.0 - 2026-10-11
 
 * Require laravel-vue-form-builder 1.7 and laravel-vue-table-builder 1.6. A crud-builder install now pulls in the
