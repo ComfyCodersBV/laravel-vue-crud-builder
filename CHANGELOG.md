@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.6.0 - 2026-10-12
+
+* Require laravel-vue-form-builder 1.9 and laravel-vue-table-builder 1.8. A crud-builder install now pulls in the
+  table builder's row key (`rowKey`, the model's key name by default, so uuid-keyed models get working selection, bulk
+  actions and reordering), a selection held by row key that survives paging and clears when a filter or the search
+  changes, and the posted table state for tables built on a Spatie query builder, together with the form builder 1.9
+  changes: Day.js date format tokens, form columns from the schema and the `@form-builder/types/...` imports.
+
 ## 1.5.0 - 2026-10-12
 
 * Require laravel-vue-form-builder 1.8 and laravel-vue-table-builder 1.7. A crud-builder install now pulls in the
