@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
-## Unreleased
+## 1.7.0 - 2026-10-13
 
 * The Vite and `tsconfig.json` patching moved to laravel-vue-form-builder, so other packages share it:
   `crud-builder:install` now uses its `InstallsFrontendAliases` trait, and the install command, `make:crud` and the
