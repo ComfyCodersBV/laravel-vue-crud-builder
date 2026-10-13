@@ -365,3 +365,38 @@ it('changes nothing when run a second time on a starter kit', function () {
         expect(file_get_contents($this->sandbox.'/'.$file))->toBe($content);
     }
 });
+
+it('reports the vite aliases and tsconfig paths it adds, and that they are present on a second run', function () {
+    file_put_contents($this->sandbox.'/package.json', json_encode(['dependencies' => ['@lucide/vue' => '^1.0']]));
+    file_put_contents($this->sandbox.'/vite.config.ts', "import { defineConfig } from 'vite';\n\nexport default defineConfig({\n    plugins: [],\n});\n");
+    file_put_contents($this->sandbox.'/tsconfig.json', "{\n    \"compilerOptions\": {\n        \"strict\": true\n    }\n}\n");
+
+    $this->artisan('crud-builder:install')
+        ->expectsOutputToContain('Vite aliases added to vite.config.ts: @form-builder, @table-builder.')
+        ->expectsOutputToContain('tsconfig.json paths added: @form-builder/types/*, @form-builder/composables/*, @table-builder/types/*, @table-builder/composables/*.')
+        ->assertSuccessful();
+
+    $this->artisan('crud-builder:install')
+        ->expectsOutputToContain('vite.config.ts already has the Vite aliases.')
+        ->expectsOutputToContain('tsconfig.json already has the builder paths.')
+        ->assertSuccessful();
+});
+
+it('says when it cannot patch the vite config or tsconfig', function () {
+    file_put_contents($this->sandbox.'/vite.config.ts', "export default {\n    plugins: [],\n};\n");
+    file_put_contents($this->sandbox.'/tsconfig.json', "{\n    \"include\": []\n}\n");
+
+    $this->artisan('crud-builder:install')
+        ->expectsOutputToContain('Could not auto-inject Vite aliases into vite.config.ts. Add them manually (see docs).')
+        ->expectsOutputToContain('Could not add the builder paths to tsconfig.json. Add them manually (see docs).')
+        ->expectsOutputToContain('npm install @lucide/vue')
+        ->assertSuccessful();
+});
+
+it('skips the vite alias setup without a vite config and the paths without a tsconfig', function () {
+    $this->artisan('crud-builder:install')
+        ->expectsOutputToContain('No vite config (vite.config.ts|js|mjs|mts) found - skipping Vite alias setup.')
+        ->doesntExpectOutputToContain('tsconfig.json')
+        ->doesntExpectOutputToContain('npm install @lucide/vue')
+        ->assertSuccessful();
+});

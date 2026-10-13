@@ -8,7 +8,7 @@ use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
-use TranquilTools\CrudBuilder\Concerns\DetectsPagesDirectory;
+use TranquilTools\VueFormBuilder\Support\Installer\DetectsPagesDirectory;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;

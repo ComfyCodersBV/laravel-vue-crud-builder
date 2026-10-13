@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace TranquilTools\CrudBuilder\Commands;
 
 use Illuminate\Console\Command;
-use TranquilTools\CrudBuilder\Concerns\DetectsPagesDirectory;
-use TranquilTools\CrudBuilder\Installer\TsConfigPatcher;
-use TranquilTools\CrudBuilder\Installer\ViteConfigPatcher;
+use TranquilTools\VueFormBuilder\Support\Installer\DetectsPagesDirectory;
+use TranquilTools\VueFormBuilder\Support\Installer\InstallsFrontendAliases;
 
 class InstallCommand extends Command
 {
     use DetectsPagesDirectory;
+    use InstallsFrontendAliases;
 
     protected $signature = 'crud-builder:install';
 
@@ -35,11 +35,11 @@ class InstallCommand extends Command
         '@table-builder/composables/*' => './vendor/tranquil-tools/laravel-vue-table-builder/resources/js/composables/*',
     ];
 
-    public function handle(ViteConfigPatcher $vite, TsConfigPatcher $tsConfig): int
+    public function handle(): int
     {
         $this->publishConfig();
-        $this->updateViteConfig($vite);
-        $this->updateTsConfig($tsConfig);
+        $this->installAliases($this->viteAliases);
+        $this->installTsPaths($this->tsConfigPaths);
         $this->updateAppCss();
         $this->reportInertiaLayout();
 
@@ -61,44 +61,15 @@ class InstallCommand extends Command
         $this->components->info('Config published → config/vue-crud-builder.php');
     }
 
-    protected function updateViteConfig(ViteConfigPatcher $vite): void
+    protected function inspectViteConfig(string $content, string $file): void
     {
-        $path = $this->firstExisting(['vite.config.ts', 'vite.config.js', 'vite.config.mjs', 'vite.config.mts']);
-
-        if (is_null($path)) {
-            $this->components->warn('No vite config (vite.config.ts|js|mjs|mts) found - skipping Vite alias setup.');
-
-            return;
-        }
-
-        $content = file_get_contents($path);
         $this->checkIconPackage();
+        $this->warnAboutDirname($content, $file);
+    }
 
-        $missing = array_filter(
-            $this->viteAliases,
-            fn (string $alias): bool => ! $vite->hasAlias($content, $alias),
-            ARRAY_FILTER_USE_KEY,
-        );
-
-        $this->warnAboutDirname($content, basename($path));
-
-        if ($missing === []) {
-            $this->components->info(basename($path).' already has the Vite aliases.');
-
-            return;
-        }
-
-        $updated = $vite->addAliases($content, $missing);
-
-        if (is_null($updated)) {
-            $this->components->warn('Could not auto-inject Vite aliases into '.basename($path).'. Add them manually (see docs).');
-
-            return;
-        }
-
-        file_put_contents($path, $updated);
-
-        $this->components->info('Vite aliases added to '.basename($path).': '.implode(', ', array_keys($missing)).'.');
+    protected function tsPathsDescription(): string
+    {
+        return 'builder paths';
     }
 
     protected function checkIconPackage(): void
@@ -140,36 +111,6 @@ class InstallCommand extends Command
         }
 
         $this->components->warn("{$file} resolves the builder aliases with __dirname, which ES module configs do not define. Switch them to fileURLToPath(new URL('./vendor/…', import.meta.url)) (see docs).");
-    }
-
-    protected function updateTsConfig(TsConfigPatcher $tsConfig): void
-    {
-        $path = base_path('tsconfig.json');
-
-        if (! file_exists($path)) {
-            return;
-        }
-
-        $content = file_get_contents($path);
-        $missing = $tsConfig->missingPaths($content, $this->tsConfigPaths);
-
-        if ($missing === []) {
-            $this->components->info('tsconfig.json already has the builder paths.');
-
-            return;
-        }
-
-        $updated = $tsConfig->addPaths($content, $missing);
-
-        if (is_null($updated)) {
-            $this->components->warn('Could not add the builder paths to tsconfig.json. Add them manually (see docs).');
-
-            return;
-        }
-
-        file_put_contents($path, $updated);
-
-        $this->components->info('tsconfig.json paths added: '.implode(', ', array_keys($missing)).'.');
     }
 
     protected function reportInertiaLayout(): void

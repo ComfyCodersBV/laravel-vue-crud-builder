@@ -9,7 +9,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use TranquilTools\CrudBuilder\Commands\CrudMakeCommand;
 use TranquilTools\CrudBuilder\Commands\InstallCommand;
-use TranquilTools\CrudBuilder\Concerns\DetectsPagesDirectory;
+use TranquilTools\VueFormBuilder\Support\Installer\DetectsPagesDirectory;
 
 class CrudBuilderServiceProvider extends PackageServiceProvider
 {
