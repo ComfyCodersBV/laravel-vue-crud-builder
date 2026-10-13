@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.7.0 - 2026-10-13
+
+* The Vite and `tsconfig.json` patching moved to laravel-vue-form-builder, so other packages share it:
+  `crud-builder:install` now uses its `InstallsFrontendAliases` trait, and the install command, `make:crud` and the
+  service provider take `DetectsPagesDirectory` from there. The output and the files written are unchanged.
+* `TranquilTools\CrudBuilder\Installer\ViteConfigPatcher`, `TranquilTools\CrudBuilder\Installer\TsConfigPatcher` and
+  `TranquilTools\CrudBuilder\Concerns\DetectsPagesDirectory` are deprecated: they are aliases of the same names under
+  `TranquilTools\VueFormBuilder\Support\Installer` and are removed in the next minor. Use the new names. The aliases
+  resolve through PSR-4 only, so an app that dumps with `--classmap-authoritative` cannot load the old names.
+* Requires laravel-vue-form-builder 1.10 or newer.
+
 ## 1.6.0 - 2026-10-12
 
 * Require laravel-vue-form-builder 1.9 and laravel-vue-table-builder 1.8. A crud-builder install now pulls in the
