@@ -3,7 +3,6 @@
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
 ## 1.7.0 - 2026-10-13
-
 * The Vite and `tsconfig.json` patching moved to laravel-vue-form-builder, so other packages share it:
   `crud-builder:install` now uses its `InstallsFrontendAliases` trait, and the install command, `make:crud` and the
   service provider take `DetectsPagesDirectory` from there. The output and the files written are unchanged.
@@ -14,7 +13,6 @@ All notable changes to `laravel-vue-crud-builder` will be documented in this fil
 * Requires laravel-vue-form-builder 1.10 or newer.
 
 ## 1.6.0 - 2026-10-12
-
 * Require laravel-vue-form-builder 1.9 and laravel-vue-table-builder 1.8. A crud-builder install now pulls in the
   table builder's row key (`rowKey`, the model's key name by default, so uuid-keyed models get working selection, bulk
   actions and reordering), a selection held by row key that survives paging and clears when a filter or the search
@@ -22,14 +20,12 @@ All notable changes to `laravel-vue-crud-builder` will be documented in this fil
   changes: Day.js date format tokens, form columns from the schema and the `@form-builder/types/...` imports.
 
 ## 1.5.0 - 2026-10-12
-
 * Require laravel-vue-form-builder 1.8 and laravel-vue-table-builder 1.7. A crud-builder install now pulls in the
   table builder's "Select all N results" that runs a bulk action over every filtered row instead of the current page,
   the confirmation of bulk actions in the Vue component, chunking that no longer skips rows of a sorted table, and
   `withoutColumnToggle()` to hide the "Columns" menu, together with the form builder 1.8 changes.
 
 ## 1.4.0 - 2026-10-11
-
 * Require laravel-vue-form-builder 1.7 and laravel-vue-table-builder 1.6. A crud-builder install now pulls in the
   table builder's totals row, CSV export, download row actions, date filter timezones, overlap mode and presets,
   tie-safe reordering and expiring signed routes with authorization hooks, and the form builder's new field types.
@@ -45,7 +41,6 @@ All notable changes to `laravel-vue-crud-builder` will be documented in this fil
   their `env()` call; without a published config, set `pages` in a published copy.
 
 ## 1.3.1 - 2026-10-11
-
 * Require laravel-vue-form-builder 1.6 and laravel-vue-table-builder 1.5, so a crud-builder install pulls in the
   row actions, empty states, reorder persistence, date filters and configurable query keys of the table builder, and
   the timezone-aware date fields, per-use form overrides, translatable built-in texts, file previews, sections and
