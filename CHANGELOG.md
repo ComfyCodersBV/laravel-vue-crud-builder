@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.7.1 - 2026-10-27
+* The introduction page explains who the package is for, how it combines the FormBuilder and TableBuilder, a quick
+  start from install to a working resource route, and when to use `make:form` or `make:table` instead.
+
 ## 1.7.0 - 2026-10-13
 * The Vite and `tsconfig.json` patching moved to laravel-vue-form-builder, so other packages share it:
   `crud-builder:install` now uses its `InstallsFrontendAliases` trait, and the install command, `make:crud` and the
