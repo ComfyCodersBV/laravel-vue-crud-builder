@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.8.1 - 2026-11-07
+* The delete dialog of the edit form stays open while the delete request runs: Esc and a click on the overlay no
+  longer close it halfway, in `Crud/Form.vue` and in `form-page.stub`.
+
 ## 1.8.0 - 2026-11-07
 * The delete button of the edit form, in the shared `Crud/Form.vue` and in the `form-page.stub` that `make:crud`
   generates from, no longer asks through `window.confirm()`. It is an icon button with the Lucide `Trash2` icon, its

@@ -57,6 +57,14 @@ async function askToDestroy(): Promise<void> {
     }
 }
 
+function setConfirming(open: boolean): void {
+    if (deleting.value) {
+        return
+    }
+
+    confirming.value = open
+}
+
 function destroy(): void {
     deleting.value = true
 
@@ -93,7 +101,7 @@ function destroy(): void {
         </div>
     </div>
 
-    <Dialog v-model:open="confirming">
+    <Dialog :open="confirming" @update:open="setConfirming">
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>{{ deleteLabel() }}</DialogTitle>

@@ -80,7 +80,7 @@ it('wires the Form page delete action through the shared translations', function
             ->toContain('<Trash2 aria-hidden="true" />')
             ->toContain(':aria-label="deleteLabel()"')
             ->toContain('resolveConfirmHandler()')
-            ->toContain('<Dialog v-model:open="confirming">');
+            ->toContain('<Dialog :open="confirming" @update:open="setConfirming">');
     }
 });
 
