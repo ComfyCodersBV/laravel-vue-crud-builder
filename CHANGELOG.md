@@ -11,6 +11,8 @@ All notable changes to `laravel-vue-crud-builder` will be documented in this fil
   per-resource `Form.vue` to pick it up.
 * New `cancel` translation, in English and Dutch, for the cancel button of that dialog.
 * Requires `tranquil-tools/laravel-vue-table-builder` 1.17, the version with `registerConfirmHandler()`.
+* The `docs/` folder ships with the package, so `vendor/tranquil-tools/laravel-vue-crud-builder/docs` holds the same
+  pages as the repository.
 
 ## 1.7.1 - 2026-10-27
 * The introduction page explains who the package is for, how it combines the FormBuilder and TableBuilder, a quick
