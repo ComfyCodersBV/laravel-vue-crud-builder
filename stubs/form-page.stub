@@ -1,8 +1,20 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
+import { Trash2 } from '@lucide/vue'
+import { ref } from 'vue'
 import Form from '@form-builder/components/Form.vue'
+import { Button } from '@form-builder/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@form-builder/components/ui/dialog'
 import type { FormSchema } from '@form-builder/types/form-builder'
 import { useTranslations } from '@table-builder/composables/useTranslations'
+import { resolveConfirmHandler } from '@table-builder/lib/confirm-handler'
 
 const props = defineProps<{
     form: FormSchema
@@ -14,11 +26,46 @@ const props = defineProps<{
 
 const { t } = useTranslations('vue_crud_builder_translations')
 
-function handleDestroy() {
-    const message = props.destroyConfirm ?? t('delete_confirm')
-    if (confirm(message)) {
-        router.delete(props.destroyRoute!)
+const confirming = ref(false)
+const deleting = ref(false)
+
+function deleteLabel(): string {
+    return props.destroyLabel ?? t('delete')
+}
+
+function deleteMessage(): string {
+    return props.destroyConfirm ?? t('delete_confirm')
+}
+
+async function askToDestroy(): Promise<void> {
+    const handler = resolveConfirmHandler()
+
+    if (!handler) {
+        confirming.value = true
+
+        return
     }
+
+    const accepted = await handler(deleteMessage(), {
+        text: null,
+        confirmButton: deleteLabel(),
+        cancelButton: t('cancel'),
+    })
+
+    if (accepted) {
+        destroy()
+    }
+}
+
+function destroy(): void {
+    deleting.value = true
+
+    router.delete(props.destroyRoute!, {
+        onFinish: () => {
+            deleting.value = false
+            confirming.value = false
+        },
+    })
 }
 </script>
 
@@ -28,9 +75,34 @@ function handleDestroy() {
         <Form :schema="form" />
 
         <div v-if="destroyRoute" class="mt-4 flex justify-end">
-            <button type="button" class="btn btn-danger" @click="handleDestroy">
-                {{ destroyLabel ?? t('delete') }}
-            </button>
+            <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                :aria-label="deleteLabel()"
+                :title="deleteLabel()"
+                data-crud-destroy
+                @click="askToDestroy"
+            >
+                <Trash2 aria-hidden="true" />
+            </Button>
         </div>
     </div>
+
+    <Dialog v-model:open="confirming">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>{{ deleteLabel() }}</DialogTitle>
+                <DialogDescription>{{ deleteMessage() }}</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+                <Button type="button" variant="outline" :disabled="deleting" @click="confirming = false">
+                    {{ t('cancel') }}
+                </Button>
+                <Button type="button" variant="destructive" :disabled="deleting" data-crud-destroy-confirm @click="destroy">
+                    {{ deleteLabel() }}
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </template>

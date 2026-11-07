@@ -85,7 +85,8 @@ All methods are written out explicitly - customise the controller directly.
 ## Delete button
 
 `make:crud` prompts whether to add a delete button to the edit form. When confirmed, the generated `edit()` method
-includes a `destroyRoute` prop that `Form.vue` uses to render the button.
+includes a `destroyRoute` prop that `Form.vue` uses to render the button: a `Trash2` icon button that asks for
+confirmation in a dialog before it deletes. See [Vue pages](vue-pages.md#delete-button-on-the-edit-form).
 
 Pass `--destroy` to skip the prompt and always include it:
 

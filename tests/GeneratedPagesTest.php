@@ -75,8 +75,12 @@ it('wires the Form page delete action through the shared translations', function
             ->toContain("useTranslations('vue_crud_builder_translations')")
             ->toContain("t('delete_confirm')")
             ->toContain("t('delete')")
-            ->toContain('router.delete(props.destroyRoute!)')
-            ->toContain('v-if="destroyRoute"');
+            ->toContain('router.delete(props.destroyRoute!, {')
+            ->toContain('v-if="destroyRoute"')
+            ->toContain('<Trash2 aria-hidden="true" />')
+            ->toContain(':aria-label="deleteLabel()"')
+            ->toContain('resolveConfirmHandler()')
+            ->toContain('<Dialog v-model:open="confirming">');
     }
 });
 

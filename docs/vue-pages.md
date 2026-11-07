@@ -135,14 +135,24 @@ return Inertia::render('Products/Form', [
 ]);
 ```
 
-The button is only rendered when `destroyRoute` is present, and it asks for confirmation before issuing
-`router.delete()`. Two additional optional props override the copy, which otherwise comes from the package
-translations:
+The button is only rendered when `destroyRoute` is present. It is an icon button with the Lucide `Trash2` icon; the
+label is its `aria-label` and tooltip. It asks for confirmation before issuing `router.delete()`, never through
+`window.confirm()`:
+
+- With a handler registered through `registerConfirmHandler()` of laravel-vue-table-builder, it asks through that
+  handler, so the edit form uses the same dialog as the row and bulk actions of your tables. The handler gets the
+  question, with the label as `confirmButton` and the `cancel` translation as `cancelButton`.
+- Without one, it opens its own dialog built on the `Dialog` components of laravel-vue-form-builder, with a cancel
+  button and a destructive delete button.
+
+Two additional optional props override the copy, which otherwise comes from the package translations:
 
 | Prop             | Falls back to translation key | English default                                |
 |------------------|-------------------------------|------------------------------------------------|
 | `destroyLabel`   | `delete`                      | `Delete`                                       |
 | `destroyConfirm` | `delete_confirm`              | `Are you sure you want to delete this record?` |
+
+The cancel button of the dialog uses the `cancel` translation (`Cancel`).
 
 `make:crud` prompts whether to include this automatically, or pass `--destroy` to skip the prompt.
 

@@ -12,5 +12,6 @@ return [
     'edit' => 'Bewerken',
     'back' => 'Terug',
     'delete' => 'Verwijderen',
+    'cancel' => 'Annuleren',
     'delete_confirm' => 'Weet je zeker dat je dit record wilt verwijderen?',
 ];

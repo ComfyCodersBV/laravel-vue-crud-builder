@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-vue-crud-builder` will be documented in this file.
 
+## 1.8.0 - 2026-11-07
+* The delete button of the edit form, in the shared `Crud/Form.vue` and in the `form-page.stub` that `make:crud`
+  generates from, no longer asks through `window.confirm()`. It is an icon button with the Lucide `Trash2` icon, its
+  label as `aria-label` and tooltip, and asks through the handler registered with `registerConfirmHandler()` of
+  laravel-vue-table-builder, so it uses the app's own dialog like the table actions. Without a handler it opens its
+  own dialog built on the `Dialog` components of laravel-vue-form-builder. Republish `Crud/Form.vue` or regenerate a
+  per-resource `Form.vue` to pick it up.
+* New `cancel` translation, in English and Dutch, for the cancel button of that dialog.
+* Requires `tranquil-tools/laravel-vue-table-builder` 1.17, the version with `registerConfirmHandler()`.
+
 ## 1.7.1 - 2026-10-27
 * The introduction page explains who the package is for, how it combines the FormBuilder and TableBuilder, a quick
   start from install to a working resource route, and when to use `make:form` or `make:table` instead.
